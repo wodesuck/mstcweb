@@ -100,7 +100,12 @@ class Form(object):
 class FormData(object):
     def __init__(self,
             form_id, event_id, name, content, status, created_time):
-        pass
+		self.form_id = form_id
+		self.event_id = event_id
+		self.name = name
+		self.content = content
+		self.status = status
+		self.created_time = created_time
 
 
 class FieldDescription(object):
@@ -116,10 +121,30 @@ class FieldDescription(object):
     def __init__(self, column_name, field_type = 'input',
             min_len = 0, max_len = 65536,
             min_val = -65535, max_val = 65535):
-        pass
+		self.column_name = column_name
+		self.field_type = field_type
+		self.min_len = min_len
+		self.max_len = max_len
+		self.min_val = min_val
+		self.max_val = max_val
 
     def to_json(self):
-        pass
+		if self.field_type == 'input' or self.field_type == 'textarea':
+			return json.dumps({
+				'column_name': self.column_name,
+				'field_type': self.field_type,
+				'min_len': self.min_len,
+				'max_len': self.max_len})
+		elif self.field_type == 'number':
+			return json.dumps({
+				'column_name': self.column_name,
+				'field_type': 'number',
+				'min_val': self.min_val,
+				'max_val': self.max_val})
+		else: 
+			return json.dumps({
+				'column_name': self.column_name,
+				'field_type': 'bool'})
 
 
 class NoSuchForm(Exception):
