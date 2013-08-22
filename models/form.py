@@ -65,15 +65,6 @@ class Form(object):
 		if matchName == None or matchEmail == None or validContent == False:
 			raise InvalidSubmit
 
-		startTime = datetime.fromtimestamp(self.start_time)
-		endTime = datetime.fromtimestamp(self.end_time)
-		today = datetime.today()
-		
-		if today < startTime:
-			raise NotStartYet
-		if today > endTime:
-			raise Ended
-				
     def query(self, items_per_page = 0, page = 0, status = None):
         """
         Query the application forms of the event.
