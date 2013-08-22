@@ -1,4 +1,5 @@
 import json, datetime, re
+import MySQLdb
 from common.db import connect_db
 
 __all__ = ['Form', 'FormData', 'FieldDescription',
@@ -6,6 +7,8 @@ __all__ = ['Form', 'FormData', 'FieldDescription',
 'NotStartYet', 'Ended']
 
 class Form(object):
+    conn = connect_db()
+    cursor = conn.cursor()
 
     def __init__(self, name = None):
         """
@@ -15,8 +18,8 @@ class Form(object):
         Raises `NoSuchName` if there doesn't exist such an event.
         """
         if name is not None:
-            self.conn = connect_db()
-            self.cursor = self.conn.cursor()
+            #self.conn = connect_db()
+            #self.cursor = self.conn.cursor()
 
             if not self.cursor.execute(
                     """SELECT `id`, `name`, `content_fields`, `start_time`,
@@ -27,7 +30,7 @@ class Form(object):
             (self.id, self.name, self.content_fields, self.start_time,
                     self.end_time, self.created_time) = self.cursor.fetchone()
             self.content_fields = map(
-                    lambda x: FieldDescription(*x),
+                    lambda x: FieldDescription(**x),
                     json.loads(self.content_fields))
 
     def submit(self, name, email, content):
@@ -79,7 +82,16 @@ class Form(object):
         Returns a list containing the application forms.
         Each form is presented as an instance of `FormData`.
         """
-        pass
+        sql = """SELECT `id`, `event_id`,
+        `name`, `email`, `content`, `status`, `created_time`
+        FROM `forms_data`"""
+        if status is not None:
+            sql += " WHERE `status` = %s" % MySQLdb.string_literal(status)
+        if items_per_page:
+            sql += ' LIMIT %d, %d' % (items_per_page * page, items_per_page)
+
+        self.cursor.execute(sql)
+        return map(lambda row: FormData(*row), self.cursor.fetchall())
 
     @classmethod
     def query_one(cls, form_id):
@@ -89,7 +101,14 @@ class Form(object):
 
         Raises `NoSuchForm` if there doesn't exist such an application form.
         """
-        pass
+        sql = """SELECT `id`, `event_id`,
+        `name`, `email`, `content`, `status`, `created_time`
+        FROM `forms_data` WHERE `id` = %s"""
+
+        if not cls.cursor.execute(sql, form_id):
+            raise NoSuchForm
+
+        return FormData(*cls.cursor.fetchone())
 
     @classmethod
     def create_event(cls, name, content_fields, start_time, end_time):
@@ -126,13 +145,17 @@ class Form(object):
 
 class FormData(object):
     def __init__(self,
-            form_id, event_id, name, content, status, created_time):
-		self.form_id = form_id
-		self.event_id = event_id
-		self.name = name
-		self.content = content
-		self.status = status
-		self.created_time = created_time
+            form_id, event_id, name, email, content, status, created_time):
+        self.form_id = form_id
+        self.event_id = event_id
+        self.name = name
+        self.email = email
+        if isinstance(content, str):
+            self.content = json.loads(content)
+        else:
+            self.content = content
+        self.status = status
+        self.created_time = created_time
 
 
 class FieldDescription(object):
