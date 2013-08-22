@@ -45,25 +45,25 @@ class Form(object):
 
         Returns the id of the new application form.
         """
-		if not self.id:
-			raise InvalidSubmit
-		
-		matchName = re.match('[\u4e00-\u9fa5]{2,4}', name)
-		matchEmail = re.match('\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*', email)
+        if not self.id:
+            raise InvalidSubmit
+        
+        matchName = re.match('[\u4e00-\u9fa5]{2,4}', name)
+        matchEmail = re.match('\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*', email)
 
-		validContent = True
-		for field in self.content_fields:
-			contentType = field.field_type
-			value = content[field.column_name]
-			if contentType == 'input' or contentType == 'textarea':
-				if len(value) < field.min_len or len(value) > field.max_len:
-					validContent = False
-			elif contentType == 'number':
-				if value < field.min_val or value > field.max_val:
-					validContent = False
+        validContent = True
+        for field in self.content_fields:
+            contentType = field.field_type
+            value = content[field.column_name]
+            if contentType == 'input' or contentType == 'textarea':
+                if len(value) < field.min_len or len(value) > field.max_len:
+                    validContent = False
+            elif contentType == 'number':
+                if value < field.min_val or value > field.max_val:
+                    validContent = False
 
-		if matchName == None or matchEmail == None or validContent == False:
-			raise InvalidSubmit
+        if matchName == None or matchEmail == None or validContent == False:
+            raise InvalidSubmit
 
     def query(self, items_per_page = 0, page = 0, status = None):
         """
@@ -162,30 +162,30 @@ class FieldDescription(object):
     def __init__(self, column_name, field_type = 'input',
             min_len = 0, max_len = 65536,
             min_val = -65535, max_val = 65535):
-		self.column_name = column_name
-		self.field_type = field_type
-		self.min_len = min_len
-		self.max_len = max_len
-		self.min_val = min_val
-		self.max_val = max_val
+        self.column_name = column_name
+        self.field_type = field_type
+        self.min_len = min_len
+        self.max_len = max_len
+        self.min_val = min_val
+        self.max_val = max_val
 
     def to_json(self):
-		if self.field_type == 'input' or self.field_type == 'textarea':
-			return json.dumps({
-				'column_name': self.column_name,
-				'field_type': self.field_type,
-				'min_len': self.min_len,
-				'max_len': self.max_len})
-		elif self.field_type == 'number':
-			return json.dumps({
-				'column_name': self.column_name,
-				'field_type': 'number',
-				'min_val': self.min_val,
-				'max_val': self.max_val})
-		else: 
-			return json.dumps({
-				'column_name': self.column_name,
-				'field_type': 'bool'})
+        if self.field_type == 'input' or self.field_type == 'textarea':
+            return json.dumps({
+                'column_name': self.column_name,
+                'field_type': self.field_type,
+                'min_len': self.min_len,
+                'max_len': self.max_len})
+        elif self.field_type == 'number':
+            return json.dumps({
+                'column_name': self.column_name,
+                'field_type': 'number',
+                'min_val': self.min_val,
+                'max_val': self.max_val})
+        else: 
+            return json.dumps({
+                'column_name': self.column_name,
+                'field_type': 'bool'})
 
 
 class NoSuchForm(Exception):
