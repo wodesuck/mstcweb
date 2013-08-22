@@ -72,8 +72,8 @@ class Form(object):
             raise Ended
 
         self.cursor.execute(
-				"INSERT INTO forms_data (event_id, name, email, content) VALUES (%d, '%s', '%s', '%s')",
-				self.id, name, email, json.dumps(content))
+                "INSERT INTO forms_data (event_id, name, email, content) VALUES (%d, '%s', '%s', '%s')",
+                self.id, name, email, json.dumps(content))
 
     def query(self, items_per_page = 0, page = 0, status = None):
         """
