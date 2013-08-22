@@ -1,4 +1,4 @@
-import json, datetime
+import json, datetime, re
 from common.db import connect_db
 
 __all__ = ['Form', 'FormData', 'FieldDescription',
@@ -42,8 +42,35 @@ class Form(object):
 
         Returns the id of the new application form.
         """
-        pass
+		if not self.id:
+			raise InvalidSubmit
+		
+		matchName = re.match('[\u4e00-\u9fa5]{2,4}', name)
+		matchEmail = re.match('\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*', email)
 
+		validContent = True
+		for field in self.content_fields:
+			contentType = field.field_type
+			value = content[field.column_name]
+			if contentType == 'input' or contentType == 'textarea':
+				if len(value) < field.min_len or len(value) > field.max_len:
+					validContent = False
+			elif contentType == 'number':
+				if value < field.min_val or value > field.max_val:
+					validContent = False
+
+		if matchName == None or matchEmail == None or validContent == False:
+			raise InvalidSubmit
+
+		startTime = datetime.fromtimestamp(self.start_time)
+		endTime = datetime.fromtimestamp(self.end_time)
+		today = datetime.today()
+		
+		if today < startTime:
+			raise NotStartYet
+		if today > endTime:
+			raise Ended
+				
     def query(self, items_per_page = 0, page = 0, status = None):
         """
         Query the application forms of the event.
