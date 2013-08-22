@@ -52,6 +52,8 @@ class Form(object):
 		matchEmail = re.match('\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*', email)
 
 		validContent = True
+		if isinstance(content, str):
+			content = json.loads(content)
 		for field in self.content_fields:
 			contentType = field.field_type
 			value = content[field.column_name]
@@ -64,6 +66,16 @@ class Form(object):
 
 		if matchName == None or matchEmail == None or validContent == False:
 			raise InvalidSubmit
+
+		submitTime = datetime.today()
+		if submitTime < self.start_time:
+			raise NotStartYet
+		if submitTime > self.end_time:
+			raise Ended
+
+        self.cursor.execute(
+				"INSERT INTO forms_data (event_id, name, email, content) VALUES (%d, '%s', '%s', '%s')",
+				self.id, name, email, json.dumps(content))
 
     def query(self, items_per_page = 0, page = 0, status = None):
         """
