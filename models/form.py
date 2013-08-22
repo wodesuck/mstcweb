@@ -7,6 +7,8 @@ __all__ = ['Form', 'FormData', 'FieldDescription',
 'NotStartYet', 'Ended']
 
 class Form(object):
+    conn = connect_db()
+    cursor = conn.cursor()
 
     def __init__(self, name = None):
         """
@@ -16,8 +18,8 @@ class Form(object):
         Raises `NoSuchName` if there doesn't exist such an event.
         """
         if name is not None:
-            self.conn = connect_db()
-            self.cursor = self.conn.cursor()
+            #self.conn = connect_db()
+            #self.cursor = self.conn.cursor()
 
             if not self.cursor.execute(
                     """SELECT `id`, `name`, `content_fields`, `start_time`,
@@ -72,16 +74,14 @@ class Form(object):
 
         Raises `NoSuchForm` if there doesn't exist such an application form.
         """
-        conn = connect_db()
-        cursor = conn.cursor()
         sql = """SELECT `id`, `event_id`,
         `name`, `email`, `content`, `status`, `created_time`
         FROM `forms_data` WHERE `id` = %s"""
 
-        if not cursor.execute(sql, form_id):
+        if not cls.cursor.execute(sql, form_id):
             raise NoSuchForm
 
-        return FormData(*cursor.fetchone())
+        return FormData(*cls.cursor.fetchone())
 
     @classmethod
     def create_event(cls, name, content_fields, start_time, end_time):
