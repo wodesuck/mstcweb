@@ -12,10 +12,14 @@ class Form(object):
 
     def __init__(self, **kwargs):
         """
-        Initialize a model object by the given event name.
-        Create an empty model object if `name` is omitted or None.
-        
-        Raises `NoSuchName` if there doesn't exist such an event.
+        Initialize a form model object according to the keyword arguments.
+        The keyword arguments should contain the following keys.
+
+        name: the event name
+        content_fields: a list of FieldDescription objects
+        start_time: the start time of the event
+        end_time: the end time of the event
+        created_time: the created time of the event
         """
         self.__dict__ = kwargs
 
@@ -101,6 +105,13 @@ class Form(object):
 
     @classmethod
     def get(cls, name):
+        """
+        Fetch data from database then create a form model object according to
+        the event name.
+        *This is a class method.*
+
+        Raises `NoSuchForm` if such a form doesn't exist.
+        """
         fields_name = ['id', 'name', 'content_fields',
                 'start_time', 'end_time', 'created_time']
 
