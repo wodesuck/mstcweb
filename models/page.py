@@ -1,4 +1,6 @@
 from common.db import connect_db
+import MySQLdb
+from datetime import datetime
 
 
 class Page(object):
@@ -30,6 +32,31 @@ class Page(object):
             raise NoSuchPage
         return cls(**dict(zip(cls.prop, cls.cursor.fetchone())))
 
+    def save(self):
+        keys, values = zip(*self.__dict__.items())
+        if hasattr(self, 'id'):  # update
+            pass  # TODO
+        else:  # insert
+            keys += ('created_time', 'updated_time')
+            values += (None, None)
+            sql = ("INSERT INTO pages (%s) VALUES (%s)" %
+                   (','.join(keys), ('%s,' * len(keys))[0:-1]))
+            try:
+                self.cursor.execute(sql, values)
+                self.id = self.cursor.lastrowid
+                # time maybe not same as db's, ignore...
+                self.created_time = self.updated_time = datetime.now()
+            except MySQLdb.IntegrityError as err:
+                if err[0] == 1062:  # mysql error 1062: Duplicate entry
+                    raise PageNameExist
+                else:
+                    raise err
+        self.conn.commit()
+
 
 class NoSuchPage(Exception):
+    pass
+
+
+class PageNameExist(Exception):
     pass
