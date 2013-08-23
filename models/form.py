@@ -1,5 +1,6 @@
-import json, datetime, re
 import MySQLdb
+import json, re
+from datetime import datetime
 from common.db import connect_db
 
 __all__ = ['Form', 'FormData', 'FieldDescription',
@@ -66,6 +67,7 @@ class Form(object):
                 (`event_id`, `name`, `email`, `content`)
                 VALUES (%s, %s, %s, %s)""",
                 (self.id, name, email, json.dumps(content)))
+        self.conn.commit()
 
     def query(self, items_per_page = 0, page = 0, status = None):
         """
