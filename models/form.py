@@ -24,6 +24,20 @@ class Form(object):
         """
         self.__dict__ = kwargs
 
+    def save(self):
+        """
+        Save a new event
+        """
+        sql = """INSERT INTO events (name, content_fields, start_time, end_time)
+        VALUES (%s, %s, %s, %s)"""
+
+		self.cursor.execute(sql, (
+            self.__dict__['name'],
+            map(lambda x: x.to_json(), self.__dict__['content_fields']),
+            self.__dict__['start_time'],
+            self.__dict__['end_time']))
+        self.conn.commit()
+
     def submit(self, name, email, content):
         """
         Submit an application form to the event.
