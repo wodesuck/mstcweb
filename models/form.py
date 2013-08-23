@@ -72,8 +72,10 @@ class Form(object):
             raise Ended
 
         self.cursor.execute(
-                "INSERT INTO forms_data (event_id, name, email, content) VALUES (%d, '%s', '%s', '%s')",
-                self.id, name, email, json.dumps(content))
+                """INSERT INTO `forms_data`
+                (`event_id`, `name`, `email`, `content`)
+                VALUES (%s, %s, %s, %s)""",
+                (self.id, name, email, json.dumps(content)))
 
     def query(self, items_per_page = 0, page = 0, status = None):
         """
@@ -89,7 +91,7 @@ class Form(object):
         if status is not None:
             sql += " WHERE `status` = %s" % MySQLdb.string_literal(status)
         if items_per_page:
-            sql += ' LIMIT %d, %d' % (items_per_page * page, items_per_page)
+            sql += " LIMIT %d, %d" % (items_per_page * page, items_per_page)
 
         self.cursor.execute(sql)
         return map(lambda row: FormData(*row), self.cursor.fetchall())
