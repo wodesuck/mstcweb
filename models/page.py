@@ -20,8 +20,8 @@ class Page(object):
     @classmethod
     def get(cls, name):
         """
-        Initialize a Page object by given name.
-        Create an empty object if `name` is omitted or None.
+        Fetch a Page object from database by given name.
+        *This is a class method*
 
         Raises `NoSuchPage` if such page doesn't exist.
         """
