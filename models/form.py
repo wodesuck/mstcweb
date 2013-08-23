@@ -10,28 +10,14 @@ class Form(object):
     conn = connect_db()
     cursor = conn.cursor()
 
-    def __init__(self, name = None):
+    def __init__(self, **kwargs):
         """
         Initialize a model object by the given event name.
         Create an empty model object if `name` is omitted or None.
         
         Raises `NoSuchName` if there doesn't exist such an event.
         """
-        if name is not None:
-            #self.conn = connect_db()
-            #self.cursor = self.conn.cursor()
-
-            if not self.cursor.execute(
-                    """SELECT `id`, `name`, `content_fields`, `start_time`,
-                    `end_time`, `created_time` FROM `events`
-                    WHERE `name` = %s""", name):
-                raise NoSuchForm
-
-            (self.id, self.name, self.content_fields, self.start_time,
-                    self.end_time, self.created_time) = self.cursor.fetchone()
-            self.content_fields = map(
-                    lambda x: FieldDescription(**x),
-                    json.loads(self.content_fields))
+        self.__dict__ = kwargs
 
     def submit(self, name, email, content):
         """
@@ -114,17 +100,21 @@ class Form(object):
         return FormData(*cls.cursor.fetchone())
 
     @classmethod
-    def create_event(cls, name, content_fields, start_time, end_time):
-        """
-        Create an event and create an model object for the
-        new event.
-        *This is a class method.*
+    def get(cls, name):
+        fields_name = ['id', 'name', 'content_fields',
+                'start_time', 'end_time', 'created_time']
 
-        Raises `NameExisted` if the name has already existed.
+        sql = "SELECT %s FROM `events` WHERE `name` = %s" % (
+                ', '.join(fields_name), MySQLdb.string_literal(name))
+        if not cls.cursor.execute(sql):
+            raise NoSuchForm
 
-        `start_time` and `end_time` are `datetime.datetime` objects.
-        """
-        pass
+        result = dict(zip(fields_name, cls.cursor.fetchone()))
+        result['content_fields'] = map(
+                lambda x: FieldDescription(**x),
+                json.loads(result['content_fields']))
+
+        return cls(**result)
 
     @classmethod
     def delete_event(cls, event_id = None, name = None):
