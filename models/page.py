@@ -18,7 +18,7 @@ class Page(object):
         Raises `NoSuchPage` if such page doesn't exist.
         """
         if name is not None:
-            sql = "SELECT %s FROM pages WHERE name = \%s" % ','.join(self.prop)
+            sql = "SELECT %s FROM pages WHERE name = %%s" % ','.join(self.prop)
             if not self.cursor.execute(sql, name):
                 raise NoSuchPage
             self.__dict__ = dict(zip(self.prop, self.cursor.fetchone()))
