@@ -1,5 +1,6 @@
-import json, datetime, re
 import MySQLdb
+import json, re
+from datetime import datetime
 from common.db import connect_db
 
 __all__ = ['Form', 'FormData', 'FieldDescription',
@@ -74,6 +75,7 @@ class Form(object):
         self.cursor.execute(
                 "INSERT INTO forms_data (event_id, name, email, content) VALUES (%d, '%s', '%s', '%s')",
                 self.id, name, email, json.dumps(content))
+        self.conn.commit()
 
     def query(self, items_per_page = 0, page = 0, status = None):
         """
@@ -122,7 +124,10 @@ class Form(object):
 
         `start_time` and `end_time` are `datetime.datetime` objects.
         """
-        pass
+		sql = "SELECT 1 FROM events WHERE name = '%s'"
+
+		if cls.cursor.execute(sql, name):
+			raise NameExisted
 
     @classmethod
     def delete_event(cls, event_id = None, name = None):
