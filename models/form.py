@@ -31,7 +31,7 @@ class Form(object):
         sql = """INSERT INTO events (name, content_fields, start_time, end_time)
         VALUES (%s, %s, %s, %s)"""
 
-		self.cursor.execute(sql, (
+        self.cursor.execute(sql, (
             self.__dict__['name'],
             map(lambda x: x.to_json(), self.__dict__['content_fields']),
             self.__dict__['start_time'],
