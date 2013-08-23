@@ -144,6 +144,7 @@ class Form(object):
             cls.cursor.execute(sql, name)
         else:
             raise TypeError('Either `event_id` or `name` must be specified')
+        cls.conn.commit()
 
     @classmethod
     def change_form_status(cls, form_id, new_status):
@@ -157,6 +158,7 @@ class Form(object):
                 "UPDATE `forms_data` SET `status` = %s WHRER `id` = %s",
                 (new_status, form_id)):
             raise NoSuchForm
+        cls.conn.commit()
 
 
 class FormData(object):
