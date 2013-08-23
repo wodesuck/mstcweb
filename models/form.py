@@ -133,7 +133,14 @@ class Form(object):
         Either `event_id` or `name` must be specified.
         *This is a class method.*
         """
-        pass
+        if event_id is not None:
+            sql = "DELETE FROM `events` WHRER `id` = %s"
+            cls.cursor.execute(sql, event_id)
+        elif name is not None:
+            sql = "DELETE FROM `events` WHERE `name` = %s"
+            cls.cursor.execute(sql, name)
+        else:
+            raise TypeError('Either `event_id` or `name` must be specified')
 
     @classmethod
     def change_form_status(cls, form_id, new_status):
