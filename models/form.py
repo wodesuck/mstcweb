@@ -40,23 +40,22 @@ class Form(object):
             raise InvalidSubmit
         
         matchName = re.match('[\u4e00-\u9fa5]{2,4}', name)
-        matchEmail = re.match('\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*', email)
+        matchEmail = re.match(
+                '\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*', email)
 
         validContent = True
-        for field in self.content_fields:
+        for field, value in zip(self.content_fields, content):
             contentType = field.field_type
-            value = content[field.column_name]
-            if contentType == 'input' or contentType == 'textarea':
-                if len(value) < field.min_len or len(value) > field.max_len:
-                    validContent = False
+
+            if contentType in ['input', 'textarea']:
+                validContent = field.min_len <= len(value) <= field.max_len
             elif contentType == 'number':
-                if value < field.min_val or value > field.max_val:
-                    validContent = False
+                validContent = field.min_val <= value <= field.max_val
 
         if matchName == None or matchEmail == None or validContent == False:
             raise InvalidSubmit
 
-        submitTime = datetime.today()
+        submitTime = datetime.now()
         if submitTime < self.start_time:
             raise NotStartYet
         if submitTime > self.end_time:
