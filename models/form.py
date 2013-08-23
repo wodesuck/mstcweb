@@ -150,7 +150,10 @@ class Form(object):
         Raises `NoSuchForm` if there doesn't exist such an application form.
         *This is a class method.*
         """
-        pass
+        if not cls.cursor.execute(
+                "UPDATE `forms_data` SET `status` = %s WHRER `id` = %s",
+                (new_status, form_id)):
+            raise NoSuchForm
 
 
 class FormData(object):
