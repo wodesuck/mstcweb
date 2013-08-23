@@ -10,28 +10,18 @@ class Form(object):
     conn = connect_db()
     cursor = conn.cursor()
 
-    def __init__(self, name = None):
+    def __init__(self, **kwargs):
         """
-        Initialize a model object by the given event name.
-        Create an empty model object if `name` is omitted or None.
-        
-        Raises `NoSuchName` if there doesn't exist such an event.
+        Initialize a form model object according to the keyword arguments.
+        The keyword arguments should contain the following keys.
+
+        name: the event name
+        content_fields: a list of FieldDescription objects
+        start_time: the start time of the event
+        end_time: the end time of the event
+        created_time: the created time of the event
         """
-        if name is not None:
-            #self.conn = connect_db()
-            #self.cursor = self.conn.cursor()
-
-            if not self.cursor.execute(
-                    """SELECT `id`, `name`, `content_fields`, `start_time`,
-                    `end_time`, `created_time` FROM `events`
-                    WHERE `name` = %s""", name):
-                raise NoSuchForm
-
-            (self.id, self.name, self.content_fields, self.start_time,
-                    self.end_time, self.created_time) = self.cursor.fetchone()
-            self.content_fields = map(
-                    lambda x: FieldDescription(**x),
-                    json.loads(self.content_fields))
+        self.__dict__ = kwargs
 
     def submit(self, name, email, content):
         """
@@ -114,17 +104,28 @@ class Form(object):
         return FormData(*cls.cursor.fetchone())
 
     @classmethod
-    def create_event(cls, name, content_fields, start_time, end_time):
+    def get(cls, name):
         """
-        Create an event and create an model object for the
-        new event.
+        Fetch data from database then create a form model object according to
+        the event name.
         *This is a class method.*
 
-        Raises `NameExisted` if the name has already existed.
-
-        `start_time` and `end_time` are `datetime.datetime` objects.
+        Raises `NoSuchForm` if such a form doesn't exist.
         """
-        pass
+        fields_name = ['id', 'name', 'content_fields',
+                'start_time', 'end_time', 'created_time']
+
+        sql = "SELECT %s FROM `events` WHERE `name` = %s" % (
+                ', '.join(fields_name), MySQLdb.string_literal(name))
+        if not cls.cursor.execute(sql):
+            raise NoSuchForm
+
+        result = dict(zip(fields_name, cls.cursor.fetchone()))
+        result['content_fields'] = map(
+                lambda x: FieldDescription(**x),
+                json.loads(result['content_fields']))
+
+        return cls(**result)
 
     @classmethod
     def delete_event(cls, event_id = None, name = None):
