@@ -120,7 +120,7 @@ class Form(object):
         sql = "SELECT %s FROM `events` WHERE `name` = %s" % (
                 ', '.join(fields_name), MySQLdb.string_literal(name))
         if not cls.cursor.execute(sql):
-            raise NoSuchForm
+            raise NoSuchEvent
 
         result = dict(zip(fields_name, cls.cursor.fetchone()))
         result['content_fields'] = map(
@@ -218,7 +218,7 @@ class FieldDescription(object):
 class NoSuchForm(Exception):
     pass
 
-class NoSuchName(Exception):
+class NoSuchEvent(Exception):
     pass
 
 class NameExisted(Exception):
