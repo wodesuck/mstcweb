@@ -34,8 +34,8 @@ class Form(object):
         self.cursor.execute(sql, (
             self.name,
             json.dumps(map(lambda x: x.to_dict(), self.content_fields)),
-            self.start_time,
-            self.end_time))
+            self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+            self.end_time.strftime('%Y-%m-%d %H:%M:%S')))
         self.conn.commit()
 
     def submit(self, name, email, content):
