@@ -15,7 +15,7 @@ class Page(object):
     def __init__(self, **kwargs):
         """
         Initialize a Page object.
-        Assign object attribute by kwargs
+        Assign object attribute by kwargs.
         """
         self.__dict__ = kwargs
 
@@ -73,6 +73,20 @@ class Page(object):
 
     def is_new(self):
         return not hasattr(self, 'id')
+
+    @classmethod
+    def create(cls, **kwargs):
+        """
+        Initialize a Page object and save it into database.
+        Return the new object.
+        Assign object attribute by kwargs.
+        *this is a class method*
+
+        Raises `PageNameExist` if `name` duplicated.
+        """
+        obj = cls(**kwargs)
+        obj.save()
+        return obj
 
 
 class NoSuchPage(Exception):
