@@ -4,7 +4,9 @@ from datetime import datetime
 
 
 class Page(object):
-    """Page model"""
+    """
+    Page model
+    """
 
     conn = connect_db()
     cursor = conn.cursor()
@@ -15,7 +17,7 @@ class Page(object):
     def __init__(self, **kwargs):
         """
         Initialize a Page object.
-        Assign object attribute by kwargs.
+        Assign object attributes by kwargs.
         """
         self.__dict__ = kwargs
 
@@ -34,9 +36,9 @@ class Page(object):
 
     def save(self):
         """
-        Save a Page object into database.
+        Save a Page object to database.
 
-        Raises `PageNameExist` if `name` duplicated when save a new record.
+        Raises `PageNameExist` if `name` duplicated when saving a new record.
         """
         keys = self.props[:]
         values = [getattr(self, x) for x in keys]
@@ -77,9 +79,9 @@ class Page(object):
     @classmethod
     def create(cls, **kwargs):
         """
-        Initialize a Page object and save it into database.
+        Initialize a Page object and save it to database.
         Return the new object.
-        Assign object attribute by kwargs.
+        Assign object attributes by kwargs.
         *this is a class method*
 
         Raises `PageNameExist` if `name` duplicated.
@@ -90,8 +92,8 @@ class Page(object):
 
     def update(self, **kwargs):
         """
-        Modify a Page object and save it into database.
-        Assign object attribute by kwargs.
+        Modify a Page object and save it to database.
+        Assign object attributes by kwargs.
         """
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
