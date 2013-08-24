@@ -39,7 +39,9 @@ class Page(object):
             # update
             sql = ("UPDATE pages SET %s WHERE id = %%s" %
                    ','.join([x + '=%s' for x in keys]))
-            self.cursor.execute(sql, tuple(values + [self.id]))
+            if self.cursor.execute(sql, tuple(values + [self.id])):
+                # time maybe not same as db's, ignore...
+                self.updated_time = datetime.now()
         else:
             # insert
             keys += ['created_time', 'updated_time']
@@ -50,14 +52,13 @@ class Page(object):
                 self.cursor.execute(sql, tuple(values))
                 self.id = self.cursor.lastrowid
                 # time maybe not same as db's, ignore...
-                self.created_time = datetime.now()
+                self.created_time = self.updated_time = datetime.now()
             except MySQLdb.IntegrityError as err:
                 if err[0] == 1062:  # mysql error 1062: Duplicate entry
                     raise PageNameExist
                 else:
                     raise err
 
-        self.updated_time = datetime.now()
         self.conn.commit()
 
 
