@@ -29,12 +29,15 @@ class Form(object):
         Save a new event
         """
         keys = ['name', 'content_fields', 'start_time', 'end_time']
-        values = [getattr(self, x) for x in keys]
+		values = [self.name,
+                json.dumps(map(lambda x: x.to_dict(), self.content_fields)),
+                self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+                self.end_time.strftime('%Y-%m-%d %H:%M:%S')]
 		
         if hasattr(self, 'id'):
             #update
-            sql = ("UPDATE events SET %s WHERE id = %%s" %
-                    ','.join([x + '=%s' for x in keys]))
+            sql = """UPDATE events SET
+            name=%s, content_fields=%s, start_time=%s, end_time=%s WHERE id = %s""" 
             self.cursor.execute(sql, tuple(values + [self.id]))
 
         else:
@@ -43,11 +46,7 @@ class Form(object):
             VALUES (%s, %s, %s, %s)"""
 
             try:
-                self.cursor.execute(sql, (
-                    self.name,
-                    json.dumps(map(lambda x: x.to_dict(), self.content_fields)),
-                    self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
-                    self.end_time.strftime('%Y-%m-%d %H:%M:%S')))
+                self.cursor.execute(sql, tuple(values))
                 self.id = self.cursor.lastrowid
                 self.created_time = datetime.now()
             except MySQLdb.IntegrityError as err:
