@@ -3,11 +3,11 @@ import json, re
 from datetime import datetime
 from common.db import connect_db
 
-__all__ = ['Form', 'FormData', 'FieldDescription',
+__all__ = ['Event', 'FormData', 'FieldDescription',
 'InvalidSubmit', 'NameExisted', 'NoSuchForm', 'NoSuchName',
 'NotStartYet', 'Ended']
 
-class Form(object):
+class Event(object):
     conn = connect_db()
     cursor = conn.cursor()
 
@@ -230,10 +230,10 @@ class FieldDescription(object):
     'number': number between min_val and max_val
     'bool': boolean value.
     """
-    def __init__(self, column_name, field_type = 'input',
+    def __init__(self, field_name, field_type = 'input',
             min_len = 0, max_len = 65536,
             min_val = -65535, max_val = 65535):
-        self.column_name = column_name
+        self.field_name = field_name
         self.field_type = field_type
         self.min_len = min_len
         self.max_len = max_len
@@ -243,19 +243,19 @@ class FieldDescription(object):
     def to_dict(self):
         if self.field_type == 'input' or self.field_type == 'textarea':
             return {
-                'column_name': self.column_name,
+                'field_name': self.field_name,
                 'field_type': self.field_type,
                 'min_len': self.min_len,
                 'max_len': self.max_len}
         elif self.field_type == 'number':
             return {
-                'column_name': self.column_name,
+                'field_name': self.field_name,
                 'field_type': 'number',
                 'min_val': self.min_val,
                 'max_val': self.max_val}
         else: 
             return {
-                'column_name': self.column_name,
+                'field_name': self.field_name,
                 'field_type': 'bool'}
 
 
