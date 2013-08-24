@@ -38,7 +38,7 @@ class Form(object):
             sql = ("INSERT INTO events (%s) VALUES (%s)" %
             (','.join(keys), ('%s,' * len(keys))[0: -1]))
 
-			try:
+            try:
                 self.cursor.execute(sql, values)
                 self.id = self.cursor.lastrowid
                 self.created_time = datetime.now()
