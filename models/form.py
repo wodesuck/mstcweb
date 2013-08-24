@@ -28,18 +28,22 @@ class Form(object):
         """
         Save a new event
         """
-        keys, values = zip(*self.__dict__.items())
-        
+        keys = ['name', 'content_fields', 'start_time', 'end_time']
+        values = [getattr(self, x) for x in keys]
+		
         if hasattr(self, 'id'):
             #update
-            pass
+            sql = ("UPDATE events SET %s WHERE id = %%s" %
+                    ','.join([x + '=%s' for x in keys]))
+            self.cursor.execute(sql, tuple(values + [self.id]))
 
         else:
+            #insert
             sql = ("INSERT INTO events (%s) VALUES (%s)" %
-            (','.join(keys), ('%s,' * len(keys))[0: -1]))
+                    (','.join(keys), ('%s,' * len(keys))[0: -1]))
 
 			try:
-                self.cursor.execute(sql, values)
+                self.cursor.execute(sql, tuple(values))
                 self.id = self.cursor.lastrowid
                 self.created_time = datetime.now()
             except MySQLdb.IntegrityError as err:
