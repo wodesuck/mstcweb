@@ -39,11 +39,15 @@ class Form(object):
 
         else:
             #insert
-            sql = ("INSERT INTO events (%s) VALUES (%s)" %
-                    (','.join(keys), ('%s,' * len(keys))[0: -1]))
+            sql = """INSERT INTO events (name, content_fields, start_time, end_time)
+            VALUES (%s, %s, %s, %s)"""
 
-			try:
-                self.cursor.execute(sql, tuple(values))
+            try:
+                self.cursor.execute(sql, (
+                    self.name,
+                    json.dumps(map(lambda x: x.to_dict(), self.content_fields)),
+                    self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    self.end_time.strftime('%Y-%m-%d %H:%M:%S')))
                 self.id = self.cursor.lastrowid
                 self.created_time = datetime.now()
             except MySQLdb.IntegrityError as err:
@@ -225,23 +229,23 @@ class FieldDescription(object):
         self.min_val = min_val
         self.max_val = max_val
 
-    def to_json(self):
+    def to_dict(self):
         if self.field_type == 'input' or self.field_type == 'textarea':
-            return json.dumps({
+            return {
                 'column_name': self.column_name,
                 'field_type': self.field_type,
                 'min_len': self.min_len,
-                'max_len': self.max_len})
+                'max_len': self.max_len}
         elif self.field_type == 'number':
-            return json.dumps({
+            return {
                 'column_name': self.column_name,
                 'field_type': 'number',
                 'min_val': self.min_val,
-                'max_val': self.max_val})
+                'max_val': self.max_val}
         else: 
-            return json.dumps({
+            return {
                 'column_name': self.column_name,
-                'field_type': 'bool'})
+                'field_type': 'bool'}
 
 
 class NoSuchForm(Exception):
