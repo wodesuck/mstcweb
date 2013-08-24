@@ -33,7 +33,7 @@ class Form(object):
 
         self.cursor.execute(sql, (
             self.name,
-            map(lambda x: x.to_json(), self.content_fields),
+            json.dumps(map(lambda x: x.to_dict(), self.content_fields)),
             self.start_time,
             self.end_time))
         self.conn.commit()
@@ -209,23 +209,23 @@ class FieldDescription(object):
         self.min_val = min_val
         self.max_val = max_val
 
-    def to_json(self):
+    def to_dict(self):
         if self.field_type == 'input' or self.field_type == 'textarea':
-            return json.dumps({
+            return {
                 'column_name': self.column_name,
                 'field_type': self.field_type,
                 'min_len': self.min_len,
-                'max_len': self.max_len})
+                'max_len': self.max_len}
         elif self.field_type == 'number':
-            return json.dumps({
+            return {
                 'column_name': self.column_name,
                 'field_type': 'number',
                 'min_val': self.min_val,
-                'max_val': self.max_val})
+                'max_val': self.max_val}
         else: 
-            return json.dumps({
+            return {
                 'column_name': self.column_name,
-                'field_type': 'bool'})
+                'field_type': 'bool'}
 
 
 class NoSuchForm(Exception):
