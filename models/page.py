@@ -33,8 +33,14 @@ class Page(object):
         return cls(**dict(zip(cls.fields, cls.cursor.fetchone())))
 
     def save(self):
+        """
+        Save a Page object into database.
+
+        Raises `PageNameExist` if `name` duplicated when save a new record.
+        """
         keys = self.props[:]
         values = [getattr(self, x) for x in keys]
+
         if hasattr(self, 'id'):
             # update
             sql = ("UPDATE pages SET %s WHERE id = %%s" %
@@ -44,8 +50,12 @@ class Page(object):
                 self.updated_time = datetime.now()
         else:
             # insert
+
+            # assigning NULL to a NOT NULL TIMESTAMP field
+            # it will assign the current timestamp instead
             keys += ['created_time', 'updated_time']
             values += [None, None]
+
             sql = ("INSERT INTO pages (%s) VALUES (%s)" %
                    (','.join(keys), ('%s,' * len(keys))[0:-1]))
             try:
