@@ -88,6 +88,15 @@ class Page(object):
         obj.save()
         return obj
 
+    def update(self, **kwargs):
+        """
+        Modify a Page object and save it into database.
+        Assign object attribute by kwargs.
+        """
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
+        self.save()
+
 
 class NoSuchPage(Exception):
     pass
