@@ -41,14 +41,7 @@ class Page(object):
         keys = self.props[:]
         values = [getattr(self, x) for x in keys]
 
-        if hasattr(self, 'id'):
-            # update
-            sql = ("UPDATE pages SET %s WHERE id = %%s" %
-                   ','.join([x + '=%s' for x in keys]))
-            if self.cursor.execute(sql, tuple(values + [self.id])):
-                # time maybe not same as db's, ignore...
-                self.updated_time = datetime.now()
-        else:
+        if self.is_new():
             # insert
 
             # assigning NULL to a NOT NULL TIMESTAMP field
@@ -68,8 +61,18 @@ class Page(object):
                     raise PageNameExist
                 else:
                     raise err
+        else:
+            # update
+            sql = ("UPDATE pages SET %s WHERE id = %%s" %
+                   ','.join([x + '=%s' for x in keys]))
+            if self.cursor.execute(sql, tuple(values + [self.id])):
+                # time maybe not same as db's, ignore...
+                self.updated_time = datetime.now()
 
         self.conn.commit()
+
+    def is_new(self):
+        return not hasattr(self, 'id')
 
 
 class NoSuchPage(Exception):
