@@ -28,14 +28,28 @@ class Form(object):
         """
         Save a new event
         """
-        sql = """INSERT INTO events (name, content_fields, start_time, end_time)
-        VALUES (%s, %s, %s, %s)"""
+        if hasattr(self, 'id'):
+            #update
+            pass
 
-        self.cursor.execute(sql, (
-            self.name,
-            json.dumps(map(lambda x: x.to_dict(), self.content_fields)),
-            self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
-            self.end_time.strftime('%Y-%m-%d %H:%M:%S')))
+        else:
+            sql = """INSERT INTO events (name, content_fields, start_time, end_time)
+            VALUES (%s, %s, %s, %s)"""
+
+            try:
+                self.cursor.execute(sql, (
+                    self.name,
+                    json.dumps(map(lambda x: x.to_dict(), self.content_fields)),
+                    self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    self.end_time.strftime('%Y-%m-%d %H:%M:%S')))
+                self.id = self.cursor.lastrowid
+                self.created_time = datetime.now()
+            except MySQLdb.IntegrityError as err:
+                if err[0] == 1062:
+                    raise NameExisted
+                else:
+                    raise err
+
         self.conn.commit()
 
     def submit(self, name, email, content):
