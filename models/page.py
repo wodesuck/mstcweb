@@ -109,6 +109,15 @@ class Page(object):
         del self.created_time
         del self.updated_time
 
+    @classmethod
+    def delete(cls, name):
+        """
+        Delete a page from database by given name.
+        *This is a class method*
+        """
+        cls.cursor.execute("DELETE FROM pages WHERE name = %s", name)
+        cls.conn.commit()
+
 
 class NoSuchPage(Exception):
     pass
