@@ -29,7 +29,7 @@ class Form(object):
         Save a new event
         """
         keys = ['name', 'content_fields', 'start_time', 'end_time']
-		values = [self.name,
+        values = [self.name,
                 json.dumps(map(lambda x: x.to_dict(), self.content_fields)),
                 self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
                 self.end_time.strftime('%Y-%m-%d %H:%M:%S')]
