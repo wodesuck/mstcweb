@@ -20,7 +20,6 @@ class Form(object):
         content_fields: a list of FieldDescription objects
         start_time: the start time of the event
         end_time: the end time of the event
-        created_time: the created time of the event
         """
         self.__dict__ = kwargs
 
@@ -72,9 +71,12 @@ class Form(object):
         if not self.id:
             raise InvalidSubmit
         
-        matchName = re.match('[\u4e00-\u9fa5]{2,4}', name)
+        matchName = re.match(u'[\u4e00-\u9fa5]{2,4}', name)
         matchEmail = re.match(
                 '\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*', email)
+
+        if matchName is None or matchEmail is None:
+            raise InvalidSubmit
 
         validContent = True
         for field, value in zip(self.content_fields, content):
@@ -85,8 +87,8 @@ class Form(object):
             elif contentType == 'number':
                 validContent = field.min_val <= value <= field.max_val
 
-        if matchName == None or matchEmail == None or validContent == False:
-            raise InvalidSubmit
+            if not validContent:
+                raise InvalidSubmit
 
         submitTime = datetime.now()
         if submitTime < self.start_time:
@@ -100,6 +102,7 @@ class Form(object):
                 VALUES (%s, %s, %s, %s)""",
                 (self.id, name, email, json.dumps(content)))
         self.conn.commit()
+        return self.cursor.lastrowid
 
     def query(self, items_per_page = 0, page = 0, status = None):
         """
@@ -111,9 +114,9 @@ class Form(object):
         """
         sql = """SELECT `id`, `event_id`,
         `name`, `email`, `content`, `status`, `created_time`
-        FROM `forms_data`"""
+        FROM `forms_data` WHERE `event_id` = %d""" % self.id
         if status is not None:
-            sql += " WHERE `status` = %s" % MySQLdb.string_literal(status)
+            sql += " AND `status` = %s" % MySQLdb.string_literal(status)
         if items_per_page:
             sql += " LIMIT %d, %d" % (items_per_page * page, items_per_page)
 
@@ -164,18 +167,27 @@ class Form(object):
     @classmethod
     def delete_event(cls, event_id = None, name = None):
         """
-        Delete an event with the given event id or name.
+        Delete the event with the given event id or name.
         Either `event_id` or `name` must be specified.
         *This is a class method.*
         """
         if event_id is not None:
-            sql = "DELETE FROM `events` WHRER `id` = %s"
+            sql = "DELETE FROM `events` WHERE `id` = %s"
             cls.cursor.execute(sql, event_id)
         elif name is not None:
             sql = "DELETE FROM `events` WHERE `name` = %s"
             cls.cursor.execute(sql, name)
         else:
             raise TypeError('Either `event_id` or `name` must be specified')
+        cls.conn.commit()
+
+    @classmethod
+    def delete_form(cls, form_id):
+        """
+        Delete the form with the given form id.
+        *This is a class method.*
+        """
+        cls.cursor.execute("DELETE FROM `forms_data` WHERE `id` = %s", form_id)
         cls.conn.commit()
 
     @classmethod
@@ -187,7 +199,7 @@ class Form(object):
         *This is a class method.*
         """
         if not cls.cursor.execute(
-                "UPDATE `forms_data` SET `status` = %s WHRER `id` = %s",
+                "UPDATE `forms_data` SET `status` = %s WHERE `id` = %s",
                 (new_status, form_id)):
             raise NoSuchForm
         cls.conn.commit()
@@ -200,7 +212,7 @@ class FormData(object):
         self.event_id = event_id
         self.name = name
         self.email = email
-        if isinstance(content, str):
+        if not isinstance(content, list):
             self.content = json.loads(content)
         else:
             self.content = content
