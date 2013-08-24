@@ -99,6 +99,16 @@ class Page(object):
             setattr(self, k, v)
         self.save()
 
+    def destroy(self):
+        """
+        Delete the page.
+        """
+        self.cursor.execute("DELETE FROM pages WHERE id = %s", self.id)
+        self.conn.commit()
+        del self.id
+        del self.created_time
+        del self.updated_time
+
 
 class NoSuchPage(Exception):
     pass
