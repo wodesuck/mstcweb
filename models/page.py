@@ -9,8 +9,8 @@ class Page(object):
     conn = connect_db()
     cursor = conn.cursor()
 
-    prop = ['id', 'name', 'title', 'content', 'layout',
-            'created_time', 'updated_time']
+    props = ['name', 'title', 'content', 'layout']
+    fields = props + ['id', 'created_time', 'updated_time']
 
     def __init__(self, **kwargs):
         """
@@ -27,30 +27,37 @@ class Page(object):
 
         Raises `NoSuchPage` if such page doesn't exist.
         """
-        sql = "SELECT %s FROM pages WHERE name = %%s" % ','.join(cls.prop)
+        sql = "SELECT %s FROM pages WHERE name = %%s" % ','.join(cls.fields)
         if not cls.cursor.execute(sql, name):
             raise NoSuchPage
-        return cls(**dict(zip(cls.prop, cls.cursor.fetchone())))
+        return cls(**dict(zip(cls.fields, cls.cursor.fetchone())))
 
     def save(self):
-        keys, values = zip(*self.__dict__.items())
-        if hasattr(self, 'id'):  # update
-            pass  # TODO
-        else:  # insert
-            keys += ('created_time', 'updated_time')
-            values += (None, None)
+        keys = self.props[:]
+        values = [getattr(self, x) for x in keys]
+        if hasattr(self, 'id'):
+            # update
+            sql = ("UPDATE pages SET %s WHERE id = %%s" %
+                   ','.join([x + '=%s' for x in keys]))
+            self.cursor.execute(sql, tuple(values + [self.id]))
+        else:
+            # insert
+            keys += ['created_time', 'updated_time']
+            values += [None, None]
             sql = ("INSERT INTO pages (%s) VALUES (%s)" %
                    (','.join(keys), ('%s,' * len(keys))[0:-1]))
             try:
-                self.cursor.execute(sql, values)
+                self.cursor.execute(sql, tuple(values))
                 self.id = self.cursor.lastrowid
                 # time maybe not same as db's, ignore...
-                self.created_time = self.updated_time = datetime.now()
+                self.created_time = datetime.now()
             except MySQLdb.IntegrityError as err:
                 if err[0] == 1062:  # mysql error 1062: Duplicate entry
                     raise PageNameExist
                 else:
                     raise err
+
+        self.updated_time = datetime.now()
         self.conn.commit()
 
 
