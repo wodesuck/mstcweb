@@ -18,10 +18,18 @@ class Page(object):
         """
         Initialize a Page object.
         Assign object attributes by kwargs.
+
+        name: the page name
+        title: the page title
+        content: the page content
+        layout: the layout used by the page
         """
         self.__dict__ = kwargs
 
     def is_new(self):
+        """
+        Recognize whether the page had been inserted into database.
+        """
         return not hasattr(self, 'id')
 
     @classmethod
