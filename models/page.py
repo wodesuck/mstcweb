@@ -113,10 +113,12 @@ class Page(object):
     def delete(cls, name):
         """
         Delete a page from database by given name.
+        Return the number of pages deleted.
         *This is a class method*
         """
-        cls.cursor.execute("DELETE FROM pages WHERE name = %s", name)
+        ret = cls.cursor.execute("DELETE FROM pages WHERE name = %s", name)
         cls.conn.commit()
+        return ret
 
 
 class NoSuchPage(Exception):
