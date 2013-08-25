@@ -1,6 +1,6 @@
 from common.db import connect_db
-import MySQLdb
 from datetime import datetime
+import MySQLdb
 
 
 class Page(object):
@@ -20,6 +20,9 @@ class Page(object):
         Assign object attributes by kwargs.
         """
         self.__dict__ = kwargs
+
+    def is_new(self):
+        return not hasattr(self, 'id')
 
     @classmethod
     def get(cls, name):
@@ -72,9 +75,6 @@ class Page(object):
                 self.updated_time = datetime.now()
 
         self.conn.commit()
-
-    def is_new(self):
-        return not hasattr(self, 'id')
 
     @classmethod
     def create(cls, **kwargs):
