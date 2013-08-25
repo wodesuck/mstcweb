@@ -7,4 +7,5 @@ def connect_db():
                            port=DB_PORT,
                            user=DB_USER,
                            passwd=DB_PASSWD,
+                           charset='utf8',
                            db=DB_DB)

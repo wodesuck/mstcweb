@@ -1,2 +1,2 @@
-import models.page as page
-import models.form as form
+import form
+import page
