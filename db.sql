@@ -9,7 +9,7 @@ CREATE TABLE pages (
 
     PRIMARY KEY (id),
     UNIQUE (name)
-)
+);
 
 CREATE TABLE `events` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
