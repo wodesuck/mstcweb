@@ -33,7 +33,7 @@ def forms(name):
 
 @app.route('/admin/forms/new')
 def admin_forms_new():
-    pass
+    return render_template('event_new.html')
 
 @app.route('/admin/forms/<name>', methods = ['DELETE'])
 def admin_forms_delete(name):
@@ -41,7 +41,12 @@ def admin_forms_delete(name):
 
 @app.route('/admin/forms/<name>/edit')
 def admin_forms_edit(name):
-    pass
+    try:
+        eventObj = form.Event.get(name)
+    except form.NoSuchEvent:
+		abort(404)
+
+    return render_template('event_edit.html', **eventObj.__dict__)
 
 @app.route('/admin/forms', methods = ['PATCH', 'POST'])
 def admin_forms_save():
@@ -57,4 +62,10 @@ def admin_forms_query_by_id(form_id):
 
 @app.route('/admin/forms/<int:form_id>/status/<int:status>', methods = ['POST'])
 def admin_forms_change_status(form_id, status):
-    pass
+    try:
+        form.Event.change_form_status(form_id, status)
+    except form.NoSuchForm:
+        return jsonify(err_code = -1, msg = u'报名表不存在')
+    else:
+        return jsonify(err_code = 0,
+                msg = u'修改成功，报名表（%d）当前状态为：%d' % (form_id, status))
