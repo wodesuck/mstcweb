@@ -93,7 +93,13 @@ def admin_forms_query(name):
 
 @app.route('/admin/forms/query/<int:form_id>')
 def admin_forms_query_by_id(form_id):
-    pass
+    try:
+        formObj = form.Event.query_one(form_id)
+    except form.NoSuchForm:
+        abort(404)
+
+    formObj.created_time = formObj.created_time.strftime('%Y-%m-%d %H:%M:%S')
+    return jsonify(err_code = 0, result = formObj.__dict__)
 
 @app.route('/admin/forms/<int:form_id>/status/<int:status>', methods = ['POST'])
 def admin_forms_change_status(form_id, status):
