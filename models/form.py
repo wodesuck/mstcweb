@@ -100,7 +100,9 @@ class Event(object):
                 """INSERT INTO `forms_data`
                 (`event_id`, `name`, `email`, `content`)
                 VALUES (%s, %s, %s, %s)""",
-                (self.id, name, email, json.dumps(content)))
+                (self.id, name, email, json.dumps(zip(
+                    map(lambda x: x.field_name, self.content_fields),
+                        content))))
         self.conn.commit()
         return self.cursor.lastrowid
 
