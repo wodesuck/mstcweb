@@ -89,7 +89,15 @@ def admin_forms_save():
 
 @app.route('/admin/forms/<name>/query')
 def admin_forms_query(name):
-    pass
+    try:
+        eventObj = form.Event.get(name)
+    except form.NoSuchEvent:
+        abort(404)
+
+    forms = eventObj.query()
+    for formObj in forms:
+        formObj.created_time = formObj.created_time.strftime('%Y-%m-%d %H:%M:%S')
+    return jsonify(err_code = 0, result = [formObj.__dict__ for formObj in forms])
 
 @app.route('/admin/forms/query/<int:form_id>')
 def admin_forms_query_by_id(form_id):
