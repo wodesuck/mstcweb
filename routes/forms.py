@@ -94,7 +94,16 @@ def admin_forms_query(name):
     except form.NoSuchEvent:
         abort(404)
 
-    forms = eventObj.query()
+    try:
+        items = int(request.args.get('items', 0))
+        page = int(request.args.get('page', 0))
+        status = request.args.get('status', None)
+        if status is not None:
+            status = int(status)
+    except ValueError:
+        abort(404)
+
+    forms = eventObj.query(items, page, status)
     for formObj in forms:
         formObj.created_time = formObj.created_time.strftime('%Y-%m-%d %H:%M:%S')
     return jsonify(err_code = 0, result = [formObj.__dict__ for formObj in forms])
