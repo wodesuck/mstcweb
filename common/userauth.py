@@ -5,48 +5,61 @@ import uuid
 from flask import session, request, jsonify, abort
 from common.db import connect_db
 
-__all__ = ['gen_session_salt', 'login', 'logout', 'check_auth']
+__all__ = ['User']
 
-def gen_session_salt():
-    session['SESSION_SALT'] = bcrypt.gensalt(8)
-    return session['SESSION_SALT']
-
-def login(username, pwhash):
-    if 'SESSION_SALT' not in session:
-        abort(400)
+class User(object):
 
     conn = connect_db()
     cursor = conn.cursor()
 
-    if not cursor.execute(
-            "SELECT `pwhash` FROM `users` WHERE `username` = %s", username):
-        abort(403)
+    def __init__(self, username, pwhash):
+        self.username = username
+        self.pwhash = pwhash
 
-    if pwhash != bcrypt.hashpw(cursor.fetchone()[0], session['SESSION_SALT']):
-        abort(403)
+    def login(self):
+        if 'SESSION_SALT' not in session:
+            abort(400)
 
-    token = uuid.uuid4().hex
-    cursor.execute(
-            "UPDATE `users` SET `token` = %s, `client_feature` = %s",
-            token, _get_client_feature())
+        if not self.cursor.execute(
+                "SELECT `pwhash` FROM `users` WHERE `username` = %s",
+                self.username):
+            abort(403)
 
-    session['USERNAME'] = username
-    session['TOKEN'] = token
-    session.pop('SESSION_SALT')
+        if self.pwhash != bcrypt.hashpw(
+                self.cursor.fetchone()[0], session['SESSION_SALT']):
+            abort(403)
 
-    return jsonify(err_code = 0)
+        token = uuid.uuid4().hex
+        self.cursor.execute(
+                "UPDATE `users` SET `token` = %s, `client_feature` = %s",
+                token, _get_client_feature())
 
-def logout():
-    pass
+        session['USERNAME'] = self.username
+        session['TOKEN'] = token
+        session.pop('SESSION_SALT')
 
-def check_auth():
-    pass
+        return jsonify(err_code = 0)
 
-def change_password(username, oldpwhash, newpwhash):
-    pass
+    def change_password(self, old_pwhash, new_pwhash):
+        pass
 
-def _get_client_feature():
-    m = hashlib.md5()
-    m.update(request.user_agent.string)
-    m.update(request.remote_addr)
-    return m.hexdigest()
+    @classmethod
+    def logout(cls):
+        pass
+
+    @classmethod
+    def check_auth(cls):
+        pass
+
+    @staticmethod
+    def _get_client_feature():
+        m = hashlib.md5()
+        m.update(request.user_agent.string)
+        m.update(request.remote_addr)
+        return m.hexdigest()
+
+    @staticmethod
+    def gen_session_salt():
+        session['SESSION_SALT'] = bcrypt.gensalt(8)
+        return session['SESSION_SALT']
+
