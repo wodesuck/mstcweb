@@ -27,21 +27,53 @@ class User(object):
 
         token = uuid.uuid4().hex
         g.cursor.execute(
-                "UPDATE `users` SET `token` = %s, `client_feature` = %s",
-                token, _get_client_feature())
+                """UPDATE `users` SET `token` = %s, `client_feature` = %s
+                WHERE `username` = %s""",
+                token, _get_client_feature(), self.username)
+        g.conn.commit()
 
         session['USERNAME'] = self.username
         session['TOKEN'] = token
         session.pop('SESSION_SALT')
 
-        return jsonify(err_code = 0)
+        return True
 
     def change_password(self, old_pwhash, new_pwhash):
-        pass
+        if 'SESSION_SALT' not in session:
+            abort(400)
+
+        if not self.check_auth():
+            abort(403)
+
+        g.cursor.execute(
+                "SELECT `pwhash` FROM `users` WHERE `username` = %s",
+                session['USERNAME'])
+        if g.cursor.fetchone()[0] != old_pwhash:
+            abort(403)
+
+        g.cursor.execute(
+                """UPDATE `users` SET `salt` = %s, `pwhash` = %s, `token` = %s,
+                WHERE `username` = %s""",
+                session['SESSION_SALT'], new_pwhash, uuid.uuid4().hex,
+                session['USERNAME'])
+        g.conn.commit()
+
+        session.pop('TOKEN')
+        session.pop('SESSION_SALT')
+        return True
 
     @classmethod
     def logout(cls):
-        pass
+        if cls.check_auth():
+            g.cursor.execute(
+                    "UPDATE `users` SET `token` = %s WHERE `username` = %s",
+                    uuid.uuid4().hex, session['USERNAME'])
+            g.conn.commit()
+
+            session.pop('TOKEN')
+            return True
+        else:
+            return False
 
     @classmethod
     def check_auth(cls):
@@ -49,7 +81,7 @@ class User(object):
                 'TOKEN' in session):
             return False
 
-        if g.cursor.execute(
+        if not g.cursor.execute(
             """SELECT `token`, `client_feature`
             FROM `users` WHERE `username` = %s""",
             session['USERNAME']):
