@@ -49,7 +49,19 @@ class User(object):
 
     @classmethod
     def check_auth(cls):
-        pass
+        if not ('USERNAME' in session and
+                'TOKEN' in session):
+            return False
+
+        if cls.cursor.execute(
+            """SELECT `token`, `client_feature`
+            FROM `users` WHERE `username` = %s""",
+            session['USERNAME']):
+            return False
+        token, client_feature = cls.cursor.fetchone()
+
+        return (token == session['TOKEN'] and
+                client_feature == cls._get_client_feature())
 
     @staticmethod
     def _get_client_feature():
