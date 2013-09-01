@@ -1,4 +1,4 @@
-from common.db import connect_db
+from flask import g
 from datetime import datetime
 import MySQLdb
 
@@ -7,9 +7,6 @@ class Page(object):
     """
     Page model
     """
-
-    conn = connect_db()
-    cursor = conn.cursor()
 
     props = ['name', 'title', 'content', 'layout']
     fields = props + ['id', 'created_time', 'updated_time']
@@ -41,9 +38,9 @@ class Page(object):
         Raises `NoSuchPage` if such page doesn't exist.
         """
         sql = "SELECT %s FROM pages WHERE name = %%s" % ','.join(cls.fields)
-        if not cls.cursor.execute(sql, name):
+        if not g.cursor.execute(sql, name):
             raise NoSuchPage
-        return cls(**dict(zip(cls.fields, cls.cursor.fetchone())))
+        return cls(**dict(zip(cls.fields, g.cursor.fetchone())))
 
     def save(self):
         """
@@ -65,8 +62,8 @@ class Page(object):
             sql = ("INSERT INTO pages (%s) VALUES (%s)" %
                    (','.join(keys), ('%s,' * len(keys))[0:-1]))
             try:
-                self.cursor.execute(sql, tuple(values))
-                self.id = self.cursor.lastrowid
+                g.cursor.execute(sql, tuple(values))
+                self.id = g.cursor.lastrowid
                 # time maybe not same as db's, ignore...
                 self.created_time = self.updated_time = datetime.now()
             except MySQLdb.IntegrityError as err:
@@ -78,11 +75,11 @@ class Page(object):
             # update
             sql = ("UPDATE pages SET %s WHERE id = %%s" %
                    ','.join([x + '=%s' for x in keys]))
-            if self.cursor.execute(sql, tuple(values + [self.id])):
+            if g.cursor.execute(sql, tuple(values + [self.id])):
                 # time maybe not same as db's, ignore...
                 self.updated_time = datetime.now()
 
-        self.conn.commit()
+        g.conn.commit()
 
     @classmethod
     def create(cls, **kwargs):
@@ -111,8 +108,8 @@ class Page(object):
         """
         Delete the page.
         """
-        self.cursor.execute("DELETE FROM pages WHERE id = %s", self.id)
-        self.conn.commit()
+        g.cursor.execute("DELETE FROM pages WHERE id = %s", self.id)
+        g.conn.commit()
         del self.id
         del self.created_time
         del self.updated_time
@@ -124,8 +121,8 @@ class Page(object):
         Return the number of pages deleted.
         *This is a class method*
         """
-        ret = cls.cursor.execute("DELETE FROM pages WHERE name = %s", name)
-        cls.conn.commit()
+        ret = g.cursor.execute("DELETE FROM pages WHERE name = %s", name)
+        g.conn.commit()
         return ret
 
 

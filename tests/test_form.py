@@ -1,10 +1,20 @@
 # -*- coding: utf8 -*-
-from models import form
 from nose.tools import (assert_raises, assert_equals,
         assert_is_instance, assert_sequence_equal)
 import datetime
 import MySQLdb
 import json
+
+import routes
+ctx = routes.app.app_context()
+ctx.push()
+
+routes.init()
+from flask import g
+from models import form
+
+conn = g.conn
+cursor = g.cursor
 
 now = datetime.datetime.now()
 timeDelta = datetime.timedelta(minutes = 10)
@@ -16,9 +26,6 @@ formFields.append(form.FieldDescription(u'数字(-10 - 10)', 'number', min_val =
 formFields.append(form.FieldDescription(u'布尔', 'bool'))
 
 validSubmitContent = [u'短文本内容', u'长文本内容', 5, True]
-
-conn = form.Event.conn
-cursor = conn.cursor()
 
 content_fields_str = json.dumps(map(lambda x: x.to_dict(), formFields))
 before = (now - timeDelta).strftime('%Y-%m-%d %H:%M:%S')
@@ -66,6 +73,8 @@ def teardown():
     cursor.execute("DELETE FROM events WHERE name LIKE 'test%'")
     cursor.execute(u"DELETE FROM forms_data WHERE name LIKE '测试%'")
     conn.commit()
+    routes.teardown()
+    ctx.pop()
 
 def testGetEvent():
     eventObj = form.Event.get('test0')
