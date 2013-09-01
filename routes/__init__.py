@@ -16,5 +16,6 @@ def teardown():
     if hasattr(g, 'conn'):
         g.conn.close()
 
+import routes.userauth
 import routes.pages
 import routes.forms
