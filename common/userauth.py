@@ -1,16 +1,12 @@
-import MySQLdb
 import bcrypt
 import hashlib
 import uuid
-from flask import session, request, jsonify, abort
+from flask import session, request, jsonify, abort, g
 from common.db import connect_db
 
 __all__ = ['User']
 
 class User(object):
-
-    conn = connect_db()
-    cursor = conn.cursor()
 
     def __init__(self, username, pwhash):
         self.username = username
@@ -20,17 +16,17 @@ class User(object):
         if 'SESSION_SALT' not in session:
             abort(400)
 
-        if not self.cursor.execute(
+        if not g.cursor.execute(
                 "SELECT `pwhash` FROM `users` WHERE `username` = %s",
                 self.username):
             abort(403)
 
         if self.pwhash != bcrypt.hashpw(
-                self.cursor.fetchone()[0], session['SESSION_SALT']):
+                g.cursor.fetchone()[0], session['SESSION_SALT']):
             abort(403)
 
         token = uuid.uuid4().hex
-        self.cursor.execute(
+        g.cursor.execute(
                 "UPDATE `users` SET `token` = %s, `client_feature` = %s",
                 token, _get_client_feature())
 
@@ -53,12 +49,12 @@ class User(object):
                 'TOKEN' in session):
             return False
 
-        if cls.cursor.execute(
+        if g.cursor.execute(
             """SELECT `token`, `client_feature`
             FROM `users` WHERE `username` = %s""",
             session['USERNAME']):
             return False
-        token, client_feature = cls.cursor.fetchone()
+        token, client_feature = g.cursor.fetchone()
 
         return (token == session['TOKEN'] and
                 client_feature == cls._get_client_feature())
