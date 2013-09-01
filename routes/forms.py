@@ -5,6 +5,18 @@ import json
 
 from flask import (request, jsonify, render_template, abort)
 
+"""
+a page for visitors to fill and submit entry forms
+abort 404 if the event name doesn't exist
+return msg when accept a post request:
+    -1 -- invalid content
+    -2 -- not started yet
+    -3 -- ended
+    0 -- success
+
+GET: show an entry form
+POST: submit an entry form to server
+"""
 @app.route('/forms/<name>', methods = ['GET', 'POST'])
 def forms(name):
     try:
@@ -31,21 +43,31 @@ def forms(name):
             return jsonify(err_code = 0,
                     msg = u'报名成功！报名编号：%d' % form_id)
 
+"""
+a page for administrators to construct new events for registration
+
+GET: show the page
+"""
 @app.route('/admin/forms/new')
 def admin_forms_new():
     return render_template('event_new.html')
 
+"""
+accept DELETE requests and delete the corresponding events in database
+
+DELETE: delete an event
+"""
 @app.route('/admin/forms/<name>', methods = ['DELETE'])
 def admin_forms_delete(name):
-    # I think this is unnecessary
-    try:
-        eventObj = form.Event.get(name)
-    except form.NoSuchEvent:
-        return jsonify(err_code = -1, msg = u'报名事件（%s）不存在' % name)
-    #
     form.Event.delete_event(name = name)
     return jsonify(err_code = 0, msg = u'报名事件（%s）已删除' % name)
 
+"""
+a page for administrators to edit existing events
+abort 404 if the event name doesn't exist
+
+GET: show the page
+"""
 @app.route('/admin/forms/<name>/edit')
 def admin_forms_edit(name):
     try:
@@ -55,6 +77,18 @@ def admin_forms_edit(name):
 
     return render_template('event_edit.html', **eventObj.__dict__)
 
+"""
+accept requests from /admin/forms/new or /admin/forms/<name>/edit
+and save changes to database
+abort 404 if the name of the patched event doesn't exist
+return msg (PATCH/POST):
+    -1 -- patched event doesn't exist / same name has existed
+    -2 -- none / database error
+    0 -- success
+
+POST: from /admin/forms/new, insert a new event to database
+PATCH: from /admin/forms/<name>/edit, change an existing entry in database
+"""
 @app.route('/admin/forms', methods = ['PATCH', 'POST'])
 def admin_forms_save():
     if request.method == 'PATCH':
@@ -87,6 +121,17 @@ def admin_forms_save():
 
         return jsonify(err_code = 0, msg = u'新报名事件创建成功 id：%d' % eventObj.id)
 
+"""
+a page for administrators to query forms of a specific event
+abort 404 if the event name doesn't exist
+accept 3 optional arguments:
+    items -- the number of forms showed in one page
+    page -- the index of page to show
+    status -- specify status of forms to show
+return result as json
+
+GET: show the query result
+"""
 @app.route('/admin/forms/<name>/query')
 def admin_forms_query(name):
     try:
@@ -108,6 +153,13 @@ def admin_forms_query(name):
         formObj.created_time = formObj.created_time.strftime('%Y-%m-%d %H:%M:%S')
     return jsonify(err_code = 0, result = [formObj.__dict__ for formObj in forms])
 
+"""
+query a form with a specific form_id
+abort 404 if there is no such form
+return result as json
+
+GET: show the query result
+"""
 @app.route('/admin/forms/query/<int:form_id>')
 def admin_forms_query_by_id(form_id):
     try:
@@ -118,6 +170,14 @@ def admin_forms_query_by_id(form_id):
     formObj.created_time = formObj.created_time.strftime('%Y-%m-%d %H:%M:%S')
     return jsonify(err_code = 0, result = formObj.__dict__)
 
+"""
+change the status of a form with the specific form_id
+return msg:
+    -1 -- form doesn't exist
+    0 -- success (with form_id and current status)
+
+POST: change a form to new status
+"""
 @app.route('/admin/forms/<int:form_id>/status/<int:status>', methods = ['POST'])
 def admin_forms_change_status(form_id, status):
     try:
