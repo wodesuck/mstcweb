@@ -73,7 +73,7 @@ def teardown():
     cursor.execute("DELETE FROM events WHERE name LIKE 'test%'")
     cursor.execute(u"DELETE FROM forms_data WHERE name LIKE '测试%'")
     conn.commit()
-    routes.teardown()
+    routes.teardown(None)
     ctx.pop()
 
 def testGetEvent():

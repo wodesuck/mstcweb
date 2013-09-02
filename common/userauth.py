@@ -29,7 +29,7 @@ class User(object):
         g.cursor.execute(
                 """UPDATE `users` SET `token` = %s, `client_feature` = %s
                 WHERE `username` = %s""",
-                token, _get_client_feature(), self.username)
+                (token, self._get_client_feature(), self.username))
         g.conn.commit()
 
         session['USERNAME'] = self.username
@@ -54,8 +54,8 @@ class User(object):
         g.cursor.execute(
                 """UPDATE `users` SET `salt` = %s, `pwhash` = %s, `token` = %s,
                 WHERE `username` = %s""",
-                session['SESSION_SALT'], new_pwhash, uuid.uuid4().hex,
-                session['USERNAME'])
+                (session['SESSION_SALT'], new_pwhash, uuid.uuid4().hex,
+                session['USERNAME']))
         g.conn.commit()
 
         session.pop('TOKEN')
@@ -67,7 +67,7 @@ class User(object):
         if cls.check_auth():
             g.cursor.execute(
                     "UPDATE `users` SET `token` = %s WHERE `username` = %s",
-                    uuid.uuid4().hex, session['USERNAME'])
+                    (uuid.uuid4().hex, session['USERNAME']))
             g.conn.commit()
 
             session.pop('TOKEN')
@@ -95,7 +95,8 @@ class User(object):
     def _get_client_feature():
         m = hashlib.md5()
         m.update(request.user_agent.string)
-        m.update(request.remote_addr)
+        if request.remote_addr is not None:
+            m.update(request.remote_addr)
         return m.hexdigest()
 
     @staticmethod

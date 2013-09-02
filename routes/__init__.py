@@ -12,7 +12,7 @@ def init():
     g.cursor = g.conn.cursor()
 
 @app.teardown_request
-def teardown():
+def teardown(e):
     if hasattr(g, 'conn'):
         g.conn.close()
 
