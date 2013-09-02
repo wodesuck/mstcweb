@@ -24,3 +24,12 @@ def logout():
 @app.route('/admin/login/test')
 def login_test():
     return str(int(userauth.check_auth()))
+
+@app.route('/admin/change_passwd', methods = ['POST'])
+def change_passwd():
+    if userauth.change_passwd(
+            request.form['oldpwhash'],
+            request.form['newpwhash']):
+        return jsonify(err_code = 0)
+    else:
+        return jsonify(err_code = -1)

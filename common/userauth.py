@@ -32,7 +32,7 @@ def login(username, pwhash):
 
     return True
 
-def change_password(old_pwhash, new_pwhash):
+def change_passwd(old_pwhash, new_pwhash):
     if 'SESSION_SALT' not in session:
         abort(400)
 
@@ -43,10 +43,10 @@ def change_password(old_pwhash, new_pwhash):
             "SELECT `pwhash` FROM `users` WHERE `username` = %s",
             session['USERNAME'])
     if g.cursor.fetchone()[0] != old_pwhash:
-        abort(403)
+        return False
 
     g.cursor.execute(
-            """UPDATE `users` SET `salt` = %s, `pwhash` = %s, `token` = %s,
+            """UPDATE `users` SET `salt` = %s, `pwhash` = %s, `token` = %s
             WHERE `username` = %s""",
             (session['SESSION_SALT'], new_pwhash, uuid.uuid4().hex,
             session['USERNAME']))
