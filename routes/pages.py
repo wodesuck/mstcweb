@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from routes import app
 from models.page import Page, NoSuchPage
+from common.userauth import check_auth
 from flask import render_template, abort
 from jinja2.exceptions import TemplateNotFound
 
@@ -15,3 +16,11 @@ def show_page(name):
         abort(404)
     except TemplateNotFound:
         abort(404)
+
+
+@app.route('/admin/pages/new')
+def admin_pages_new(name):
+    if not check_auth():
+        abort(403)
+
+    return render_template('page_new.html')
