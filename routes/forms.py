@@ -2,6 +2,7 @@
 from routes import app
 from models import form
 import json
+from common.userauth import check_auth
 
 from flask import (request, jsonify, render_template, abort)
 
@@ -28,7 +29,6 @@ def forms(name):
         return render_template('form.html', **eventObj.__dict__)
     else:
         try:
-            print request.form['content']
             form_id = eventObj.submit(
                     request.form['name'],
                     request.form['email'],
@@ -50,6 +50,9 @@ def admin_forms_new():
 
     GET: show the page
     """
+    if not check_auth():
+        abort(403)
+
     return render_template('event_new.html')
 
 @app.route('/admin/forms/<name>', methods = ['DELETE'])
@@ -59,6 +62,9 @@ def admin_forms_delete(name):
 
     DELETE: delete an event
     """
+    if not check_auth():
+        abort(403)
+
     form.Event.delete_event(name = name)
     return jsonify(err_code = 0, msg = u'报名事件（%s）已删除' % name)
 
@@ -70,6 +76,9 @@ def admin_forms_edit(name):
 
     GET: show the page
     """
+    if not check_auth():
+        abort(403)
+
     try:
         eventObj = form.Event.get(name)
     except form.NoSuchEvent:
@@ -91,6 +100,9 @@ def admin_forms_save():
     POST: from /admin/forms/new, insert a new event to database
     PATCH: from /admin/forms/<name>/edit, change an existing entry in database
     """
+    if not check_auth():
+        abort(403)
+
     if request.method == 'PATCH':
         try:
             eventObj = form.Event.get(name)
@@ -134,6 +146,9 @@ def admin_forms_query(name):
 
     GET: show the query result
     """
+    if not check_auth():
+        abort(403)
+
     try:
         eventObj = form.Event.get(name)
     except form.NoSuchEvent:
@@ -162,6 +177,9 @@ def admin_forms_query_by_id(form_id):
 
     GET: show the query result
     """
+    if not check_auth():
+        abort(403)
+
     try:
         formObj = form.Event.query_one(form_id)
     except form.NoSuchForm:
@@ -180,6 +198,9 @@ def admin_forms_change_status(form_id, status):
 
     POST: change a form to new status
     """
+    if not check_auth():
+        abort(403)
+
     try:
         form.Event.change_form_status(form_id, status)
     except form.NoSuchForm:
