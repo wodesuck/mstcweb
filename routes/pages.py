@@ -33,3 +33,15 @@ def admin_pages_delete(name):
 
     Page.delete(name)
     return jsonify(err_code=0, msg=u'页面（%s）已删除' % name)
+
+
+@app.route('/admin/pages/<name>/edit')
+def admin_pages_edit(name):
+    if not check_auth():
+        abort(403)
+
+    try:
+        page = Page.get(name)
+        return render_template('page_edit.html', **page.__dict__)
+    except NoSuchPage:
+        abort(404)
