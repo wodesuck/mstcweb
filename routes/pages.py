@@ -2,7 +2,7 @@
 from routes import app
 from models.page import Page, NoSuchPage
 from common.userauth import check_auth
-from flask import render_template, abort, jsonify
+from flask import render_template, abort, jsonify, request
 from jinja2.exceptions import TemplateNotFound
 
 
@@ -45,3 +45,19 @@ def admin_pages_edit(name):
         return render_template('page_edit.html', **page.__dict__)
     except NoSuchPage:
         abort(404)
+
+
+@app.route('/admin/pages', methods=['PATCH', 'POST'])
+def admin_pages_save():
+    if not check_auth():
+        abort(403)
+
+    if request.method == 'PATCH':
+        name = request.form['name']
+        try:
+            Page.get(name).update(**request.form)
+            return jsonify(err_code=0, msg=u'修改保存成功')
+        except NoSuchPage:
+            return jsonify(err_code=-1, msg=u'页面（%s）不存在' % name)
+    else:
+        pass
