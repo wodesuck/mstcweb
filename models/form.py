@@ -1,15 +1,13 @@
 import MySQLdb
 import json, re
 from datetime import datetime
-from common.db import connect_db
+from flask import g
 
 __all__ = ['Event', 'FormData', 'FieldDescription',
 'InvalidSubmit', 'NameExisted', 'NoSuchForm', 'NoSuchName',
 'NotStartYet', 'Ended']
 
 class Event(object):
-    conn = connect_db()
-    cursor = conn.cursor()
 
     def __init__(self, **kwargs):
         """
@@ -37,7 +35,7 @@ class Event(object):
             #update
             sql = """UPDATE events SET
             name=%s, content_fields=%s, start_time=%s, end_time=%s WHERE id = %s""" 
-            self.cursor.execute(sql, tuple(values + [self.id]))
+            g.cursor.execute(sql, tuple(values + [self.id]))
 
         else:
             #insert
@@ -45,8 +43,8 @@ class Event(object):
             VALUES (%s, %s, %s, %s)"""
 
             try:
-                self.cursor.execute(sql, tuple(values))
-                self.id = self.cursor.lastrowid
+                g.cursor.execute(sql, tuple(values))
+                self.id = g.cursor.lastrowid
                 self.created_time = datetime.now()
             except MySQLdb.IntegrityError as err:
                 if err[0] == 1062:
@@ -54,7 +52,7 @@ class Event(object):
                 else:
                     raise err
 
-        self.conn.commit()
+        g.conn.commit()
 
     def submit(self, name, email, content):
         """
@@ -96,13 +94,15 @@ class Event(object):
         if submitTime > self.end_time:
             raise Ended
 
-        self.cursor.execute(
+        g.cursor.execute(
                 """INSERT INTO `forms_data`
                 (`event_id`, `name`, `email`, `content`)
                 VALUES (%s, %s, %s, %s)""",
-                (self.id, name, email, json.dumps(content)))
-        self.conn.commit()
-        return self.cursor.lastrowid
+                (self.id, name, email, json.dumps(zip(
+                    map(lambda x: x.field_name, self.content_fields),
+                        content))))
+        g.conn.commit()
+        return g.cursor.lastrowid
 
     def query(self, items_per_page = 0, page = 0, status = None):
         """
@@ -120,8 +120,8 @@ class Event(object):
         if items_per_page:
             sql += " LIMIT %d, %d" % (items_per_page * page, items_per_page)
 
-        self.cursor.execute(sql)
-        return map(lambda row: FormData(*row), self.cursor.fetchall())
+        g.cursor.execute(sql)
+        return map(lambda row: FormData(*row), g.cursor.fetchall())
 
     @classmethod
     def query_one(cls, form_id):
@@ -135,10 +135,10 @@ class Event(object):
         `name`, `email`, `content`, `status`, `created_time`
         FROM `forms_data` WHERE `id` = %s"""
 
-        if not cls.cursor.execute(sql, form_id):
+        if not g.cursor.execute(sql, form_id):
             raise NoSuchForm
 
-        return FormData(*cls.cursor.fetchone())
+        return FormData(*g.cursor.fetchone())
 
     @classmethod
     def get(cls, name):
@@ -154,10 +154,10 @@ class Event(object):
 
         sql = "SELECT %s FROM `events` WHERE `name` = %s" % (
                 ', '.join(fields_name), MySQLdb.string_literal(name))
-        if not cls.cursor.execute(sql):
+        if not g.cursor.execute(sql):
             raise NoSuchEvent
 
-        result = dict(zip(fields_name, cls.cursor.fetchone()))
+        result = dict(zip(fields_name, g.cursor.fetchone()))
         result['content_fields'] = map(
                 lambda x: FieldDescription(**x),
                 json.loads(result['content_fields']))
@@ -173,13 +173,13 @@ class Event(object):
         """
         if event_id is not None:
             sql = "DELETE FROM `events` WHERE `id` = %s"
-            cls.cursor.execute(sql, event_id)
+            g.cursor.execute(sql, event_id)
         elif name is not None:
             sql = "DELETE FROM `events` WHERE `name` = %s"
-            cls.cursor.execute(sql, name)
+            g.cursor.execute(sql, name)
         else:
             raise TypeError('Either `event_id` or `name` must be specified')
-        cls.conn.commit()
+        g.conn.commit()
 
     @classmethod
     def delete_form(cls, form_id):
@@ -187,8 +187,8 @@ class Event(object):
         Delete the form with the given form id.
         *This is a class method.*
         """
-        cls.cursor.execute("DELETE FROM `forms_data` WHERE `id` = %s", form_id)
-        cls.conn.commit()
+        g.cursor.execute("DELETE FROM `forms_data` WHERE `id` = %s", form_id)
+        g.conn.commit()
 
     @classmethod
     def change_form_status(cls, form_id, new_status):
@@ -198,11 +198,11 @@ class Event(object):
         Raises `NoSuchForm` if there doesn't exist such an application form.
         *This is a class method.*
         """
-        if not cls.cursor.execute(
+        if not g.cursor.execute(
                 "UPDATE `forms_data` SET `status` = %s WHERE `id` = %s",
                 (new_status, form_id)):
             raise NoSuchForm
-        cls.conn.commit()
+        g.conn.commit()
 
 
 class FormData(object):
