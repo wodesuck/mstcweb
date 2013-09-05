@@ -3,8 +3,11 @@ from routes import app
 from models import form
 import json
 from common.userauth import check_auth
-
+from datetime import datetime
 from flask import (request, jsonify, render_template, abort)
+
+def _from_datetime_str(datetime_str):
+    return datetime.strptime(datatime_str, '%Y-%m-%d %H:%M:%S')
 
 @app.route('/forms/<name>', methods = ['GET', 'POST'])
 def forms(name):
@@ -105,14 +108,14 @@ def admin_forms_save():
 
     if request.method == 'PATCH':
         try:
-            eventObj = form.Event.get(name)
+            eventObj = form.Event.get(request.form['name'])
         except form.NoSuchEvent:
-            return jsonify(err_code = -1, msg = u'报名事件（%s）不存在' % name)
+            return jsonify(err_code = -1, msg = u'报名事件（%s）不存在' % request.form['name'])
 
         eventObj.content_fields = map(lambda x: form.FieldDescription(**x),
                 json.loads(request.form['content_fields']))
-        eventObj.start_time = form.datetime(request.form['start_time'])
-        eventObj.end_time = form.datetime(request.form['end_time'])
+        eventObj.start_time = _from_datetime_str(request.form['start_time'])
+        eventObj.end_time = _from_datetime_str(request.form['end_time'])
         eventObj.save()
         return jsonify(err_code = 0, msg = u'修改保存成功')
 
@@ -120,8 +123,8 @@ def admin_forms_save():
         args = { 'name': request.form['name'], 
                 'content_fields': map(lambda x: form.FieldDescription(**x),
                     json.loads(request.form['content_fields'])),
-                'start_time': form.datetime(request.form['start_time']),
-                'end_time': form.datetime(request.form['end_time'])}
+                'start_time': _from_datetime_str(request.form['start_time']),
+                'end_time': _from_datetime_str(request.form['end_time'])}
         eventObj = form.Event(**args)
 
         try:
