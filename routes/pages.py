@@ -11,7 +11,7 @@ import MySQLdb
 def show_page(name):
     try:
         page = Page.get(name)
-        return render_template('layouts/%s.html' % page.layout,
+        return render_template('pages/%s.html' % page.layout,
                                **page.__dict__)
     except NoSuchPage:
         abort(404)
@@ -27,7 +27,7 @@ def admin_pages_new(name):
     return render_template('page_new.html')
 
 
-@app.route('/admin/pages/<name>', method=['DELETE'])
+@app.route('/admin/pages/<name>', methods=['DELETE'])
 def admin_pages_delete(name):
     if not check_auth():
         abort(403)
