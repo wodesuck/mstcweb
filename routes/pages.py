@@ -1,9 +1,10 @@
 # -*- coding: utf8 -*-
 from routes import app
-from models.page import Page, NoSuchPage
+from models.page import Page, NoSuchPage, PageNameExist
 from common.userauth import check_auth
 from flask import render_template, abort, jsonify, request
 from jinja2.exceptions import TemplateNotFound
+import MySQLdb
 
 
 @app.route('/pages/<name>')
@@ -49,15 +50,33 @@ def admin_pages_edit(name):
 
 @app.route('/admin/pages', methods=['PATCH', 'POST'])
 def admin_pages_save():
+    """
+    accept requests from /admin/pages/new or /admin/pages/<name>/edit
+    save changes to database
+    return msg:
+        -1 -- patched page doesn't exist / same name has existed
+        -2 -- database error
+        0 -- success
+    POST: from /admin/pages/new, insert a new page to database
+    PATCH: from /admin/pages/<name>/edit, change an existing entry in database
+    """
     if not check_auth():
         abort(403)
 
+    name = request.form['name']
     if request.method == 'PATCH':
-        name = request.form['name']
         try:
             Page.get(name).update(**request.form)
-            return jsonify(err_code=0, msg=u'修改保存成功')
         except NoSuchPage:
             return jsonify(err_code=-1, msg=u'页面（%s）不存在' % name)
+
+        return jsonify(err_code=0, msg=u'修改保存成功')
     else:
-        pass
+        try:
+            Page.create(**request.form)
+        except PageNameExist:
+            return jsonify(err_code=-1, msg=u'页面名称（%s）已存在' % name)
+        except MySQLdb.IntegrityError:
+            return jsonify(err_code=-1, msg=u'数据库错误')
+
+        return jsonify(err_code=0, msg=u'页面新建成功')
