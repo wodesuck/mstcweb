@@ -1,6 +1,7 @@
 from flask import Flask, g, session
 import uuid
 import MySQLdb
+from functools import wraps
 from common.db import connect_db
 from common.config import SESSION_KEY
 
@@ -23,6 +24,22 @@ def gen_csrf_token(refresh = False):
     return session['CSRF_TOKEN']
 
 app.jinja_env.globals['CSRF_TOKEN'] = gen_csrf_token
+
+def _build_csrf_white_list():
+    white_list = set()
+
+    def decorator(func):
+        white_list.add(func.__name__)
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return white_list, decorator
+
+csrf_white_list, disable_csrf_protection = _build_csrf_white_list()
 
 import routes.userauth
 import routes.pages
