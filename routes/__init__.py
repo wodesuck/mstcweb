@@ -10,8 +10,7 @@ app.secret_key = SESSION_KEY
 
 @app.before_request
 def init():
-    g.conn = connect_db()
-    g.cursor = g.conn.cursor()
+    init_db()
 
     if (request.method in ['POST', 'PUT'] and
             request.endpoint not in csrf_white_list):
@@ -23,6 +22,10 @@ def init():
 def teardown(e):
     if hasattr(g, 'conn'):
         g.conn.close()
+
+def init_db():
+    g.conn = connect_db()
+    g.cursor = g.conn.cursor()
 
 #For CSRF protection
 def gen_csrf_token(refresh = False):

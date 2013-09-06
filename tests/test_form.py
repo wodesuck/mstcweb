@@ -9,7 +9,7 @@ import routes
 ctx = routes.app.app_context()
 ctx.push()
 
-routes.init()
+routes.init_db()
 from flask import g
 from models import form
 
