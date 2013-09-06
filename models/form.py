@@ -101,8 +101,8 @@ class Event(object):
                 (self.id, name, email, json.dumps(zip(
                     map(lambda x: x.field_name, self.content_fields),
                         content))))
-        self.conn.commit()
-        return self.cursor.lastrowid
+        g.conn.commit()
+        return g.cursor.lastrowid
 
     def query(self, items_per_page = 0, page = 0, status = None):
         """
