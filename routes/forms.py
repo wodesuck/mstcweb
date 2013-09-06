@@ -12,16 +12,17 @@ def _from_datetime_str(datetime_str):
 @app.route('/forms/<name>', methods = ['GET', 'POST'])
 def forms(name):
     """
-    a page for visitors to fill and submit entry forms
-    abort 404 if the event name doesn't exist
-    return msg when accept a post request:
-        -1 -- invalid content
-        -2 -- not started yet
-        -3 -- ended
-        0 -- success
+    Show the entry form or deal with the submitted form.
+    If argument 'name' is not an existing event name, abort 404.
 
-    GET: show an entry form
-    POST: submit an entry form to server
+    GET: Show the entry form.
+	
+    POST: Submit the entry form. Return one of the following messages.
+
+        invalid content (err_code = -1)
+        not started     (err_code = -2)
+        ended           (err_code = -3)
+        accepted        (err_code =  0)
     """
     try:
         eventObj = form.Event.get(name)
@@ -49,9 +50,8 @@ def forms(name):
 @app.route('/admin/forms/new')
 def admin_forms_new():
     """
-    a page for administrators to construct new events for registration
-
-    GET: show the page
+    Show the edit page for creating new event.
+    Administrator should have logged in to access this page.
     """
     if not check_auth():
         abort(403)
@@ -74,10 +74,9 @@ def admin_forms_delete(name):
 @app.route('/admin/forms/<name>/edit')
 def admin_forms_edit(name):
     """
-    a page for administrators to edit existing events
-    abort 404 if the event name doesn't exist
-
-    GET: show the page
+    Show the edit page for changing existing event.
+    Administrator should have logged in to access this page.
+    If argument 'name' is not an existing event name, abort 404.
     """
     if not check_auth():
         abort(403)
@@ -139,15 +138,16 @@ def admin_forms_save():
 @app.route('/admin/forms/<name>/query')
 def admin_forms_query(name):
     """
-    a page for administrators to query forms of a specific event
-    abort 404 if the event name doesn't exist
-    accept 3 optional arguments:
-        items -- the number of forms showed in one page
-        page -- the index of page to show
-        status -- specify status of forms to show
-    return result as json
+    Query forms of a specific event.
+    Administrator should have logged in to access this page.
+    If argument 'name' is not an existing event name, abort 404.
 
-    GET: show the query result
+    Accept 3 optional request arguments:
+        items  -- the number of forms showed in one page
+        page   -- the index of page to show
+        status -- the specify status of forms to show
+
+    Return query results as json.
     """
     if not check_auth():
         abort(403)
@@ -174,11 +174,10 @@ def admin_forms_query(name):
 @app.route('/admin/forms/query/<int:form_id>')
 def admin_forms_query_by_id(form_id):
     """
-    query a form with a specific form_id
-    abort 404 if there is no such form
-    return result as json
-
-    GET: show the query result
+    Query the form with the specific id.
+    Administrator should have logged in to access this page.
+    Abort 404 if there is no such form.
+    Return the query result as json.
     """
     if not check_auth():
         abort(403)
@@ -194,12 +193,10 @@ def admin_forms_query_by_id(form_id):
 @app.route('/admin/forms/<int:form_id>/status/<int:status>', methods = ['POST'])
 def admin_forms_change_status(form_id, status):
     """
-    change the status of a form with the specific form_id
-    return msg:
-        -1 -- form doesn't exist
-        0 -- success (with form_id and current status)
-
-    POST: change a form to new status
+    Change the status of the form with the specific id
+    Administrator should have logged in to access this page.
+    Abort 404 if there is no such form.
+    Return new status.
     """
     if not check_auth():
         abort(403)
@@ -207,7 +204,7 @@ def admin_forms_change_status(form_id, status):
     try:
         form.Event.change_form_status(form_id, status)
     except form.NoSuchForm:
-        return jsonify(err_code = -1, msg = u'报名表不存在')
+        abort(404)
     else:
         return jsonify(err_code = 0,
                 msg = u'修改成功，报名表（%d）当前状态为：%d' % (form_id, status))
