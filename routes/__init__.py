@@ -1,4 +1,4 @@
-from flask import Flask, g, session
+from flask import Flask, g, session, request, abort
 import uuid
 import MySQLdb
 from functools import wraps
@@ -13,11 +13,18 @@ def init():
     g.conn = connect_db()
     g.cursor = g.conn.cursor()
 
+    if (request.method in ['POST', 'PUT'] and
+            request.endpoint not in csrf_white_list):
+        token = session.pop('CSRF_TOKEN', None)
+        if not token or token != request.form.get('CSRF_TOKEN'):
+            abort(403)
+
 @app.teardown_request
 def teardown(e):
     if hasattr(g, 'conn'):
         g.conn.close()
 
+#For CSRF protection
 def gen_csrf_token(refresh = False):
     if refresh or 'CSRF_TOKEN' not in session:
         session['CSRF_TOKEN'] = uuid.uuid4().hex

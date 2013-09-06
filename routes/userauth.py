@@ -1,8 +1,9 @@
-from routes import app
+from routes import app, disable_csrf_protection
 from common import userauth
 from flask import request, jsonify
 
 @app.route('/admin/login', methods = ['GET', 'POST'])
+@disable_csrf_protection
 def login():
     """
     Login.
@@ -45,6 +46,7 @@ def login_test():
     return str(int(userauth.check_auth()))
 
 @app.route('/admin/change_passwd', methods = ['POST'])
+@disable_csrf_protection
 def change_passwd():
     """
     Change password.
