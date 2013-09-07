@@ -14,9 +14,18 @@ def init():
 
     if (request.method in ['POST', 'PUT'] and
             request.endpoint not in csrf_white_list):
-        token = session.pop('CSRF_TOKEN', None)
-        if not token or token != request.form.get('CSRF_TOKEN'):
+        s_token = session.pop('CSRF_TOKEN', None)
+        r_token = request.form.get('CSRF_TOKEN',
+                request.headers.get('X-CSRFToken'))
+
+        if not s_token or s_token != r_token:
             abort(403)
+
+@app.after_request
+def after_request(req):
+    if hasattr(g, 'update_csrf_token') and g.update_csrf_token:
+        req.set_cookie('X-CSRFToken', session['CSRF_TOKEN'])
+    return req
 
 @app.teardown_request
 def teardown(e):
@@ -31,6 +40,7 @@ def init_db():
 def gen_csrf_token(refresh = False):
     if refresh or 'CSRF_TOKEN' not in session:
         session['CSRF_TOKEN'] = uuid.uuid4().hex
+        g.update_csrf_token = True
     return session['CSRF_TOKEN']
 
 app.jinja_env.globals['CSRF_TOKEN'] = gen_csrf_token
