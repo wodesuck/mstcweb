@@ -11,7 +11,7 @@ def login():
         Username should be a query string argument with the name `username`.
 
     POST: Login. Username and password hash should be specified in the post
-        data. Password hash is calculated by the fellowing formula.
+        data. Password hash is calculated by the following formula.
 
         hash_0 = Bcrypt(password, account_salt)
         hash = Bcrypt(hash_0, session_salt)
