@@ -6,15 +6,8 @@ import MySQLdb
 import json
 
 import routes
-ctx = routes.app.app_context()
-ctx.push()
-
-routes.init()
 from flask import g
 from models import form
-
-conn = g.conn
-cursor = g.cursor
 
 now = datetime.datetime.now()
 timeDelta = datetime.timedelta(minutes = 10)
@@ -31,48 +24,60 @@ content_fields_str = json.dumps(map(lambda x: x.to_dict(), formFields))
 before = (now - timeDelta).strftime('%Y-%m-%d %H:%M:%S')
 after = (now + timeDelta).strftime('%Y-%m-%d %H:%M:%S')
 
-cursor.executemany(
-        """INSERT INTO events
-        (name, content_fields, start_time, end_time)
-        VALUES (%s, %s, %s, %s)""", [
-            ('test0', '[]', 0, 0),
-            ('test1', '[]', 0, 0),
-            ('testQueryForm', '[]', 0, 0),
-            ('testDeleteEvent', '[]', 0, 0),
-            ('testForm', content_fields_str, before, after),
-            ('testFormNotStarted', content_fields_str, after, after),
-            ('testFormEnded', content_fields_str, before, before)
-            ]
-        )
-conn.commit()
+def setUp():
+    routes.app.testing = True
+    global ctx
+    ctx = routes.app.app_context()
+    ctx.push()
+    routes.init_db()
 
-cursor.execute("SELECT id FROM events WHERE name = 'testDeleteEvent'")
-deleteEventId = cursor.fetchone()[0]
+    g.cursor.executemany(
+            """INSERT INTO events
+            (name, content_fields, start_time, end_time)
+            VALUES (%s, %s, %s, %s)""", [
+                ('test0', '[]', 0, 0),
+                ('test1', '[]', 0, 0),
+                ('testQueryForm', '[]', 0, 0),
+                ('testDeleteEvent', '[]', 0, 0),
+                ('testForm', content_fields_str, before, after),
+                ('testFormNotStarted', content_fields_str, after, after),
+                ('testFormEnded', content_fields_str, before, before)
+                ]
+            )
+    g.conn.commit()
 
-cursor.execute("SELECT id FROM events WHERE name = 'testQueryForm'")
-testQueryId = cursor.fetchone()[0]
+    g.cursor.execute("SELECT id FROM events WHERE name = 'testDeleteEvent'")
+    global deleteEventId
+    deleteEventId = g.cursor.fetchone()[0]
+
+    g.cursor.execute("SELECT id FROM events WHERE name = 'testQueryForm'")
+    global testQueryId
+    testQueryId = g.cursor.fetchone()[0]
+
+    global changeStatusFormId
+    changeStatusFormId = insert_form((0, u'测试', 'xxx@xxx.com', '[]', 0))
+    global deleteFormId
+    deleteFormId = insert_form((0, u'测试', 'xxx@xxx.com', '[]', 0))
+
+    global queryFormIds
+    queryFormIds = map(
+            lambda i: insert_form(
+                (testQueryId, u'测试', 'xxx@xxx.com', '[]', i)),
+            [1, 1, 0, 0, 0])
+
+    g.conn.commit()
 
 def insert_form(x):
-    cursor.execute(
+    g.cursor.execute(
             """INSERT INTO forms_data
             (event_id, name, email, content, status)
             VALUES (%s, %s, %s, %s, %s)""", x)
-    return cursor.lastrowid
-
-changeStatueFormId = insert_form((0, u'测试', 'xxx@xxx.com', '[]', 0))
-deleteFormId = insert_form((0, u'测试', 'xxx@xxx.com', '[]', 0))
-
-queryFormIds = map(
-        lambda i: insert_form(
-            (testQueryId, u'测试', 'xxx@xxx.com', '[]', i)),
-        [1, 1, 0, 0, 0])
-
-conn.commit()
+    return g.cursor.lastrowid
 
 def teardown():
-    cursor.execute("DELETE FROM events WHERE name LIKE 'test%'")
-    cursor.execute(u"DELETE FROM forms_data WHERE name LIKE '测试%'")
-    conn.commit()
+    g.cursor.execute("DELETE FROM events WHERE name LIKE 'test%'")
+    g.cursor.execute(u"DELETE FROM forms_data WHERE name LIKE '测试%'")
+    g.conn.commit()
     routes.teardown(None)
     ctx.pop()
 
@@ -109,15 +114,15 @@ def testEditEvent():
 def testDeleteEventByName():
     form.Event.delete_event(name = 'test1')
 
-    cursor.execute("SELECT COUNT(*) FROM `events` WHERE `name` = 'test1'")
-    assert_equals(cursor.fetchone()[0], 0)
+    g.cursor.execute("SELECT COUNT(*) FROM `events` WHERE `name` = 'test1'")
+    assert_equals(g.cursor.fetchone()[0], 0)
 
 def testDeleteEventById():
     form.Event.delete_event(event_id = deleteEventId)
 
-    cursor.execute(
+    g.cursor.execute(
             "SELECT COUNT(*) FROM `events` WHERE `id` = %s", deleteEventId)
-    assert_equals(cursor.fetchone()[0], 0)
+    assert_equals(g.cursor.fetchone()[0], 0)
 
 def testSubmitForm():
     eventObj = form.Event.get('testForm')
@@ -159,18 +164,18 @@ def testSubmitFormEnded():
             u'测试', 'abc.def+ghi@mail2.sysu.edu.cn', validSubmitContent)
 
 def testChangeFormStatus():
-    form.Event.change_form_status(changeStatueFormId, 1)
+    form.Event.change_form_status(changeStatusFormId, 1)
 
-    cursor.execute("SELECT `status` FROM `forms_data` WHERE `id` = %s",
-            changeStatueFormId)
-    assert_equals(cursor.fetchone()[0], 1)
+    g.cursor.execute("SELECT `status` FROM `forms_data` WHERE `id` = %s",
+            changeStatusFormId)
+    assert_equals(g.cursor.fetchone()[0], 1)
 
 def testDeleteForm():
     form.Event.delete_form(deleteFormId)
 
-    cursor.execute("SELECT COUNT(*) FROM `forms_data` WHERE `id` = %s",
+    g.cursor.execute("SELECT COUNT(*) FROM `forms_data` WHERE `id` = %s",
             deleteFormId)
-    assert_equals(cursor.fetchone()[0], 0)
+    assert_equals(g.cursor.fetchone()[0], 0)
 
 def testQueryForm():
     eventObj = form.Event.get('testQueryForm')
