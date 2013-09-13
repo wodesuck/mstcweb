@@ -1,58 +1,58 @@
 <!DOCTYPE HTML>
 
 <form id="form">
-	<input type="hidden" id="csrf" value={{ CSRF_TOKEN }}>
-	<table>
-		<tr>
-			<td>姓名：</td>
-			<td><input type="text" id="name"></td>
-		</tr>
-		<tr>
-			<td>邮箱：</td>
-			<td><input type="text" id="email"></td>
-		</tr>
-		{% for field in content_fields %}
-		<tr>
-			<td>{{ field.field_name }}：</td>
-			{% if field.field_type == "input" %}
-			<td><input type="text" class="content"></td>
-			{% endif %}
-			{% if field.field_type == "textarea" %}
-			<td><textarea rows="5" cols="60" class="content"></textarea></td>
-			{% endif %}
-			{% if field.field_type == "number" %}
-			<td><input type="number" class="content"></td>
-			{% endif %}
-			{% if field.field_type == "bool" %}
-			<td><input type="checkbox" class="content"></td>
-			{% endif %}
-		</tr>
-		{% endfor %}
-	</table>
-	<p id="response"></p>
-	<input type="submit" id="submit" onclick="postForm();">
+    <input type="hidden" id="csrf" value={{ CSRF_TOKEN }}>
+    <table>
+        <tr>
+            <td>姓名：</td>
+            <td><input type="text" id="name"></td>
+        </tr>
+        <tr>
+            <td>邮箱：</td>
+            <td><input type="text" id="email"></td>
+        </tr>
+        {% for field in content_fields %}
+        <tr>
+            <td>{{ field.field_name }}：</td>
+            {% if field.field_type == "input" %}
+            <td><input type="text" class="content"></td>
+            {% endif %}
+            {% if field.field_type == "textarea" %}
+            <td><textarea rows="5" cols="60" class="content"></textarea></td>
+            {% endif %}
+            {% if field.field_type == "number" %}
+            <td><input type="number" class="content"></td>
+            {% endif %}
+            {% if field.field_type == "bool" %}
+            <td><input type="checkbox" class="content"></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+    <p id="response"></p>
+    <input type="submit" id="submit" onclick="postForm();">
 </form>
 
 <script>
-	function postForm() {
-		$("#submit").disabled = true;
-		var content = new Array();
-		for (c in $(".content"))
-			if (c.type == "checkbox")
-				content.push(c.checked);
-			else
-				content.push(c.value);
+    function postForm() {
+        $("#submit").disabled = true;
+        var content = new Array();
+        for (c in $(".content"))
+            if (c.type == "checkbox")
+                content.push(c.checked);
+            else
+                content.push(c.value);
 
-		$.post("/forms/{{ name }}", {
-			CSRF_TOKEN: $("#csrf").value,
-			name: $("#name"),
-			email: $("#email"),
-			content: content
-			}, function(response) {
-				if (response.err_code == 0)
-					$("#form").remove();
-				$("#response").textContent = response.msg;
-				$("#submit").disabled = false;
-			}, "json");
-	}
+        $.post("/forms/{{ name }}", {
+            CSRF_TOKEN: $("#csrf").value,
+            name: $("#name"),
+            email: $("#email"),
+            content: content
+            }, function(response) {
+                if (response.err_code == 0)
+                    $("#form").remove();
+                $("#response").textContent = response.msg;
+                $("#submit").disabled = false;
+            }, "json");
+    }
 </script>
