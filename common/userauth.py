@@ -93,11 +93,12 @@ def _get_client_feature():
 def get_salt(username):
     if not g.cursor.execute(
             "SELECT `salt` FROM `users` WHERE `username` = %s", username):
-        abort(404)
-    account_salt = g.cursor.fetchone()[0]
+        account_salt = bcrypt.gensalt(8)
+    else:
+        account_salt = g.cursor.fetchone()[0]
 
     session['SESSION_SALT'] = bcrypt.gensalt(8)
 
     return {'account_salt': account_salt,
-            'session_salt': session['SESSION_SALT']} 
+            'session_salt': session['SESSION_SALT']}
 
