@@ -52,7 +52,8 @@ def admin_forms():
     if not check_auth():
         abort(403)
 
-    return render_template('admin_forms.html')
+    return render_template('admin_forms.html',
+            items_list = form.Event.get_events_list())
 
 @app.route('/admin/forms/query')
 def admin_forms_query():
