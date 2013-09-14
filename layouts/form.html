@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
 
+<h3 id="sucmsg"></h3>
 <form id="form">
     <input type="hidden" id="csrf" value={{ CSRF_TOKEN }}>
     <table>
@@ -29,7 +30,7 @@
         </tr>
         {% endfor %}
     </table>
-    <p id="response"></p>
+    <p id="errmsg"></p>
     <button id="submit" onclick="postForm();">提交报名</button>
 </form>
 
@@ -49,10 +50,14 @@
             email: $("#email")[0].value,
             content: content
             }, function(response) {
-                if (response.err_code == 0)
+                if (response.err_code == 0) {
                     $("#form")[0].remove();
-                $("#response")[0].textContent = response.msg;
-                $("#submit")[0].disabled = false;
+                    $("#sucmsg")[0].textContent = response.msg;
+                }
+                else {
+                    $("#errmsg")[0].textContent = response.msg;
+                    $("#submit")[0].disabled = false;
+                }
             }, "json");
     }
 </script>
