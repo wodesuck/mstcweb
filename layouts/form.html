@@ -30,29 +30,29 @@
         {% endfor %}
     </table>
     <p id="response"></p>
-    <input type="submit" id="submit" onclick="postForm();">
+	<button id="submit" onclick="postForm();">提交报名</button>
 </form>
 
 <script>
     function postForm() {
-        $("#submit").disabled = true;
+        $("#submit")[0].disabled = true;
         var content = new Array();
-        for (c in $(".content"))
-            if (c.type == "checkbox")
-                content.push(c.checked);
+        for (var i = 0; i < $(".content").length; i++)
+            if ($(".content")[i].type == "checkbox")
+                content.push($(".content")[i].checked);
             else
-                content.push(c.value);
+                content.push($(".content")[i].value);
 
         $.post("/forms/{{ name }}", {
-            CSRF_TOKEN: $("#csrf").value,
-            name: $("#name"),
-            email: $("#email"),
+            CSRF_TOKEN: $("#csrf")[0].value,
+            name: $("#name")[0].value,
+            email: $("#email")[0].value,
             content: content
             }, function(response) {
                 if (response.err_code == 0)
-                    $("#form").remove();
-                $("#response").textContent = response.msg;
-                $("#submit").disabled = false;
+                    $("#form")[0].remove();
+                $("#response")[0].textContent = response.msg;
+                $("#submit")[0].disabled = false;
             }, "json");
     }
 </script>
