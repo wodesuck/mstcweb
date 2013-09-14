@@ -16,18 +16,20 @@
   </head>
 
   <body>
-    
+
     <div class="container">
       <form id="main-login-form">
         <h2 class="text-center">管理员登录</h2>
         <input type="text" class="form-control" placeholder="用户名" autofocus>
         <input type="password" class="form-control" placeholder="密码">
         <button class="btn btn-lg btn-primary btn-block">登录</button>
+        <div class="alert alert-danger"><strong>登录失败！</strong>请检查用户名和密码。</div>
       </form>
     </div>
 
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bCrypt.js"></script>
     <script src="/static/js/admin.js"></script>
   </body>
 </html>
