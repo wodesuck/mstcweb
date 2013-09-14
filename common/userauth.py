@@ -15,8 +15,10 @@ def login(username, pwhash):
             username):
         abort(403)
 
-    if pwhash != bcrypt.hashpw(
-            g.cursor.fetchone()[0], session['SESSION_SALT']):
+    hash_0 = g.cursor.fetchone()[0].encode('ascii')
+    session_salt = session['SESSION_SALT'].encode('ascii')
+
+    if pwhash != bcrypt.hashpw(hash_0, session_salt):
         abort(403)
 
     token = uuid.uuid4().hex
