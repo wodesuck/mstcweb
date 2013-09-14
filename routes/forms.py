@@ -49,10 +49,16 @@ def forms(name):
 
 @app.route('/admin/forms')
 def admin_forms():
+    if not check_auth():
+        abort(403)
+
     return render_template('admin_forms.html')
 
 @app.route('/admin/forms/query')
 def admin_forms_query():
+    if not check_auth():
+        abort(403)
+
     return render_template('admin_forms_query.html')
 
 @app.route('/admin/forms/new', methods = ['GET', 'POST'])

@@ -20,6 +20,12 @@ function login() {
   });
 }
 
+function logout() {
+  $.get('/admin/logout', function() {
+    location.href = '/admin';
+  });
+}
+
 $(function() {
   //Register events for login page
   $('#main-login-form button').click(function(e) {
