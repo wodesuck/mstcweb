@@ -129,21 +129,17 @@ class Page(object):
     def get_pages_list(cls, items_per_page = 0, page = 0):
         """
         Get a list of the pages.
-        Return the name, title, content and updated_time of each page.
+        Return a list Page objects.
         *This is a class method.*
         """
-        sql = """SELECT name, title, content, updated_time FROM pages
-        ORDER BY created_time DESC"""
+        sql = """SELECT %s FROM pages
+        ORDER BY created_time DESC""" % ', '.join(cls.fields)
         if items_per_page:
             sql += ' LIMIT %d, %d' % (items_per_page * page, items_per_page)
         g.cursor.execute(sql)
 
-        return [{
-            'name': row[0],
-            'title': row[1],
-            'content': row[2],
-            'updated_time': row[3]
-            } for row in g.cursor.fetchall()]
+        return [Page(**dict(zip(cls.fields, row)))
+                for row in g.cursor.fetchall()]
 
 
 class NoSuchPage(Exception):
