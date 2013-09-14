@@ -45,13 +45,13 @@
                 content.push($(".content")[i].value);
 
         $.post("/forms/{{ name }}", {
-            CSRF_TOKEN: $("#csrf")[0].value,
-            name: $("#name")[0].value,
-            email: $("#email")[0].value,
+            CSRF_TOKEN: $("#csrf").val(),
+            name: $("#name").val(),
+            email: $("#email").val(),
             content: content
             }, function(response) {
                 if (response.err_code == 0) {
-                    $("#form")[0].remove();
+                    $("#form").remove();
                     $("#sucmsg")[0].textContent = response.msg;
                 }
                 else {
