@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from nose.tools import (assert_raises, assert_equals,
-        assert_is_instance, assert_sequence_equal)
+        assert_is_instance, assert_sequence_equal, assert_items_equal)
 import datetime
 import MySQLdb
 import json
@@ -41,10 +41,23 @@ def setUp():
                 ('testDeleteEvent', '[]', 0, 0),
                 ('testForm', content_fields_str, before, after),
                 ('testFormNotStarted', content_fields_str, after, after),
-                ('testFormEnded', content_fields_str, before, before)
+                ('testFormEnded', content_fields_str, before, before),
+                ('testEventsList0', '[]', after, after),
+                ('testEventsList1', '[]', before, after),
+                ('testEventsList2', '[]', before, before),
                 ]
             )
-    g.conn.commit()
+
+    g.cursor.executemany(
+            """INSERT INTO pages
+            (name, title, content, layout)
+            VALUES (%s, %s, %s, %s)""", [
+                ('testEventsList0', '', '', ''),
+                ('testEventsList1', '', '', ''),
+                ('testEventsList2', '', '', ''),
+                ('testEventsListNot', '', '', ''),
+                ]
+            )
 
     g.cursor.execute("SELECT id FROM events WHERE name = 'testDeleteEvent'")
     global deleteEventId
@@ -76,6 +89,7 @@ def insert_form(x):
 
 def teardown():
     g.cursor.execute("DELETE FROM events WHERE name LIKE 'test%'")
+    g.cursor.execute("DELETE FROM pages WHERE name LIKE 'test%'")
     g.cursor.execute(u"DELETE FROM forms_data WHERE name LIKE '测试%'")
     g.conn.commit()
     routes.teardown(None)
@@ -192,3 +206,13 @@ def testQueryForm():
 def testQueryOneForm():
     assert_equals(queryFormIds[0],
             form.Event.query_one(queryFormIds[0]).form_id)
+
+def testEventsList():
+    assert_sequence_equal(
+            map(lambda x: (x['name'], x['status']), form.Event.get_events_list()),
+            [('testEventsList2', 1), ('testEventsList1', 0),
+                ('testEventsList0', -1)])
+
+    assert_sequence_equal(
+            map(lambda x: x['name'], form.Event.get_events_list(2, 1)),
+            ['testEventsList0'])

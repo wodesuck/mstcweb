@@ -125,6 +125,22 @@ class Page(object):
         g.conn.commit()
         return ret
 
+    @classmethod
+    def get_pages_list(cls, items_per_page = 0, page = 0):
+        """
+        Get a list of the pages.
+        Return a list Page objects.
+        *This is a class method.*
+        """
+        sql = """SELECT %s FROM pages
+        ORDER BY created_time DESC""" % ', '.join(cls.fields)
+        if items_per_page:
+            sql += ' LIMIT %d, %d' % (items_per_page * page, items_per_page)
+        g.cursor.execute(sql)
+
+        return [Page(**dict(zip(cls.fields, row)))
+                for row in g.cursor.fetchall()]
+
 
 class NoSuchPage(Exception):
     pass

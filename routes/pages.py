@@ -24,7 +24,8 @@ def admin_pages():
     if not check_auth():
         abort(403)
 
-    return render_template('admin_pages.html')
+    return render_template('admin_pages.html',
+            items_list = Page.get_pages_list())
 
 
 @app.route('/admin/pages/new', methods=['GET', 'POST'])

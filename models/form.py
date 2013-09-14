@@ -204,6 +204,48 @@ class Event(object):
             raise NoSuchForm
         g.conn.commit()
 
+    @classmethod
+    def get_events_list(cls, items_per_page = 0, page = 0):
+        """
+        Get a list of all events.
+
+        Return a list of maps containing the id, name, title(from pages),
+        start_time, end_time and status of each events.
+
+        status:
+             0 - Ongoing
+            -1 - Not started yet
+             1 - Ended
+
+        *This is a class method.*
+        """
+        sql = """SELECT events.id, events.name, pages.title,
+        events.start_time, events.end_time FROM events
+        INNER JOIN pages ON events.name = pages.name
+        ORDER BY events.id DESC"""
+        if items_per_page:
+            sql += ' LIMIT %d, %d' % (items_per_page * page, items_per_page)
+        g.cursor.execute(sql)
+
+        now = datetime.now()
+        def get_status(start, end):
+            if start > now:
+                return -1
+            elif start <= now < end:
+                return 0
+            else:
+                return 1
+
+        result = [{
+            'id': row[0],
+            'name': row[1],
+            'title': row[2],
+            'start_time': row[3],
+            'end_time': row[4],
+            'status': get_status(row[3], row[4])
+            } for row in g.cursor.fetchall()]
+
+        return result
 
 class FormData(object):
     def __init__(self,
