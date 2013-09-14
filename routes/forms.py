@@ -36,7 +36,7 @@ def forms(name):
             form_id = eventObj.submit(
                     request.form['name'],
                     request.form['email'],
-                    json.loads(request.form['content']))
+                    request.form.getlist('content[]'))
         except form.InvalidSubmit:
             return jsonify(err_code = -1, msg = u'提交内容无效')
         except form.NotStartYet:
