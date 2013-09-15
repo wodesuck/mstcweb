@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <title>MSTC</title>
+    <meta charset="utf-8" />
+    <meta name="viewpoint" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/static/css/custom.css" rel="stylesheet" type="text/css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top text-center" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">MSTC</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li id="index"><a href="/">首页</a></li>
+          <li id="pages"><a href="/pages">动态</a></li>
+          <li id="about"><a href="#">关于</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <img class="col-md-8" src="/static/img/logo1.png" />
+      </div>
+      {% block main %}{% endblock %}
+    </div>
+
+    <footer>
+      <div class="container">
+        <div class="col-md-4"></div>
+        <span class="col-md-4">&copy SYSU MSTC 2013.All rights reserved</span>
+        <div class="col-md-4"></div>
+      </div>
+    </footer>
+    <script>$("#{% block active %}{% endblock %}").addClass("active");</script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+{% extends "frame.html" %}
+{% block active %}pages{% endblock %}
+{% block main %}
+<div class="jumbotron">
+  <div class="container">
+    <h1>{{ title }}</h1>
+    {{ content|safe }}
+    {% block form %}{% endblock %}
+  </div>
+</div>
+{% endblock %}

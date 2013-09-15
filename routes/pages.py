@@ -15,7 +15,7 @@ def show_pages_list():
 def show_page(name):
     try:
         page = Page.get(name)
-        return render_template('pages/%s.html' % page.layout,
+        return render_template('%s.html' % page.layout,
                                **page.__dict__)
     except NoSuchPage:
         abort(404)

@@ -1,0 +1,29 @@
+{% extends "frame.html" %}
+{% block active %}pages{% endblock %}
+{% block main %}
+<div class="row">
+  <div class="col-md-9">
+    <ul class="list-group">
+      {% for page in pageList %}
+      <li class="list-group-item">
+        <a href="/pages/{{ page.name }}"><h3>{{ page.title }}</h3></a>
+        <div class="jumbotron">
+          <div class="container">
+            {{ page.content|safe }}
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="col-md-3">
+    <div data-spy="affix" data-offset-top="150">
+      <ul class="list-group">
+        {% for page in pageList %}
+  	  <li class="list-group-item"><a href="/pages/{{ page.name }}">{{ page.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
