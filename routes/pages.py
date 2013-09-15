@@ -57,7 +57,7 @@ def admin_pages_new():
             Page.create(name = request.form['name'],
                     title = request.form['title'],
                     content = request.form['content'],
-                    layout = request.form.get('layout', None))
+                    layout = "pure_page")
         except PageNameExist:
             return jsonify(err_code=-1, msg=u'页面名称（%s）已存在' % name)
         except MySQLdb.IntegrityError:
