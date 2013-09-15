@@ -50,3 +50,8 @@ body
   display: none;
   margin-top: 10px;
 }
+
+#edit-form-submit
+{
+  margin: 15px;
+}
