@@ -47,6 +47,21 @@ def forms(name):
             return jsonify(err_code = 0,
                     msg = u'报名成功！报名编号：%d' % form_id)
 
+@app.route('/admin/forms')
+def admin_forms():
+    if not check_auth():
+        abort(403)
+
+    return render_template('admin_forms.html',
+            items_list = form.Event.get_events_list())
+
+@app.route('/admin/forms/query')
+def admin_forms_query():
+    if not check_auth():
+        abort(403)
+
+    return render_template('admin_forms_query.html')
+
 @app.route('/admin/forms/new', methods = ['GET', 'POST'])
 def admin_forms_new():
     """
@@ -65,7 +80,7 @@ def admin_forms_new():
         abort(403)
 
     if request.method == 'GET':
-        return render_template('event_new.html')
+        return render_template('admin_forms_new.html')
 
     else:
         args = { 'name': request.form['name'], 
@@ -104,7 +119,7 @@ def admin_forms_edit(name):
         abort(404)
 
     if request.method == 'GET':
-        return render_template('event_edit.html', **eventObj.__dict__)
+        return render_template('admin_forms_edit.html', **eventObj.__dict__)
 
     else:
         eventObj.content_fields = map(lambda x: form.FieldDescription(**x),
@@ -127,7 +142,7 @@ def admin_forms_delete(name):
     return jsonify(err_code = 0, msg = u'报名事件（%s）已删除' % name)
 
 @app.route('/admin/forms/<name>/query')
-def admin_forms_query(name):
+def admin_forms_query_by_form_name(name):
     """
     Query forms of a specific event.
     Administrator should have logged in to access this page.

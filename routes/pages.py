@@ -19,6 +19,15 @@ def show_page(name):
         abort(404)
 
 
+@app.route('/admin/pages')
+def admin_pages():
+    if not check_auth():
+        abort(403)
+
+    return render_template('admin_pages.html',
+            items_list = Page.get_pages_list())
+
+
 @app.route('/admin/pages/new', methods=['GET', 'POST'])
 def admin_pages_new():
     """
@@ -37,7 +46,7 @@ def admin_pages_new():
         abort(403)
 
     if request.method == 'GET':
-        return render_template('page_new.html')
+        return render_template('admin_pages_new.html')
     else:
         try:
             name = request.form['name']
@@ -70,7 +79,7 @@ def admin_pages_edit(name):
         abort(404)
 
     if request.method == 'GET':
-        return render_template('page_edit.html', **page.__dict__)
+        return render_template('admin_pages_edit.html', **page.__dict__)
     else:
         page.update(**request.form)
         return jsonify(err_code=0, msg=u'修改保存成功')

@@ -1,11 +1,14 @@
-from flask import Flask, g, session, request, abort
+from flask import Flask, g, session, request, abort, render_template
 import uuid
 import MySQLdb
 from functools import wraps
 from common.db import connect_db
 from common.config import SESSION_KEY
+from common.userauth import check_auth
 
-app = Flask(__name__, template_folder = '../layouts')
+app = Flask(__name__,
+        template_folder = '../layouts',
+        static_folder = '../static')
 app.secret_key = SESSION_KEY
 
 @app.before_request
@@ -35,6 +38,13 @@ def teardown(e):
 def init_db():
     g.conn = connect_db()
     g.cursor = g.conn.cursor()
+
+@app.route('/admin')
+def admin_index():
+    if check_auth():
+        return render_template('admin_index.html')
+    else:
+        return render_template('admin_login.html')
 
 #For CSRF protection
 def gen_csrf_token(refresh = False):

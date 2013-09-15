@@ -15,8 +15,10 @@ def login(username, pwhash):
             username):
         abort(403)
 
-    if pwhash != bcrypt.hashpw(
-            g.cursor.fetchone()[0], session['SESSION_SALT']):
+    hash_0 = g.cursor.fetchone()[0].encode('ascii')
+    session_salt = session['SESSION_SALT'].encode('ascii')
+
+    if pwhash != bcrypt.hashpw(hash_0, session_salt):
         abort(403)
 
     token = uuid.uuid4().hex
@@ -93,11 +95,12 @@ def _get_client_feature():
 def get_salt(username):
     if not g.cursor.execute(
             "SELECT `salt` FROM `users` WHERE `username` = %s", username):
-        abort(404)
-    account_salt = g.cursor.fetchone()[0]
+        account_salt = bcrypt.gensalt(8)
+    else:
+        account_salt = g.cursor.fetchone()[0]
 
     session['SESSION_SALT'] = bcrypt.gensalt(8)
 
     return {'account_salt': account_salt,
-            'session_salt': session['SESSION_SALT']} 
+            'session_salt': session['SESSION_SALT']}
 
