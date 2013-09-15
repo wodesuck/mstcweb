@@ -1,70 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-   <meta charset="gb2312" />
-   <title>MSTC</title>
-   <link href="static/css/bootstrap.css" rel="stylesheet" type="text/css">
-   <link href="static/css/custom.css" rel="stylesheet" type="text/css">
-   <script type="text/javascript" src="static/js/bootstrap.js"></script>
-   <script type="text/javascript" src="static/js/custom.js"></script>
-</head>
-<body>
-   <header>
-      <nav class="navbar-default navbar-fixed-top" role="navigation">
-            <ul class="nav">
-			    <li class="col-md-8"></li>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Page</a></li>
-				<li><a href="#">About</a></li>
-			</ul>
-      </nav>
-      <div class="title">
-	     <img class="col-md-1" src="static/img/logo.png" />
-         <h1>�д�΢�����ֲ�</h1>
-         <h4>Sun Yat-sen University MSTC</h4>
-      </div>
-  </header>
-  <section>
-      <div  id="myCarousel" class="carousel slide">
-      <!-- Indicators -->
-         <ol class="carousel-indicators">
-            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-            <li data-target="#myCarousel" data-slide-to="1"></li>
-            <li data-target="#myCarousel" data-slide-to="2"></li>
-         </ol>
+<html lang="zh-CN">
+  <head>
+    <title>MSTC</title>
+    <meta charset="utf-8" />
+    <meta name="viewpoint" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/static/css/custom.css" rel="stylesheet" type="text/css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+  </head>
 
-      <!-- Wrapper for slides -->
-         <div class="carousel-inner">
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top text-center" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">MSTC</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#">首页</a></li>
+          <li><a href="#">动态</a></li>
+          <li><a href="#">关于</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="row">
+        <img class="col-md-1" src="static/img/logo.png" />
+        <div class="col-md-10">
+          <h1>中山大学微软俱乐部</h1>
+          <h4>Sun Yat-sen University MSTC</h4>
+        </div>
+      </div>
+
+      <div class="row">
+        <div id="slides" class="carousel slide">
+
+          <ol class="carousel-indicators">
+            <li data-target="#slides" data-slide-to="0" class="active"></li>
+            <li data-target="#slides" data-slide-to="1"></li>
+            <li data-target="#slides" data-slide-to="2"></li>
+          </ol>
+
+          <div class="carousel-inner">
             <div class="item active">
-              <img src="static/img/NIKON D7000003.jpg" alt="" /> 
+              <img src="static/img/NIKON D7000003.jpg" alt="Firstslide" /> 
             </div>
-			<div class="item">
-			  <img src="static/img/NIKON D7000004.jpg" alt="" /> 
-			</div>
-			<div class="item">
-			  <img src="static/img/DSC_0070.jpg" alt="" /> 
-			</div>
-         </div>
-     </div>
-	 <div class="list-group col-md-2">
+            <div class="item">
+              <img src="static/img/NIKON D7000004.jpg" alt="Secondslide" /> 
+            </div>
+            <div class="item">
+              <img src="static/img/DSC_0070.jpg" alt="Thirdslide" /> 
+            </div>
+          </div>
+
+          <a class="left carousel-control" href="#slides" data-slide="prev">
+            <span class="icon-prev"></span>
+          </a>
+          <a class="right carousel-control" href="#slides" data-slide="next">
+            <span class="icon-next"></span>
+          </a>
+        </div>
+      </div>
+
+      <div class="list-group col-md-2">
         <a href="#" class="list-group-item">News</a>
         <a href="#" class="list-group-item">Intern</a>
         <a href="#" class="list-group-item">More</a>
-     </div>
-	 <div class="col-md-2"></div>
-	 <div class="col-md-8 board">
-	 </div>
-  	 <div class="about">
-	    <div class="">
-		    <img src="" />
-			
-		</div>
-  	 </div>
-  </section>
-  <footer>
-     <div class="col-md-4"></div>
-     <p>Contact us</p>
-	 <p>2013 MSTC</p>
-  </footer>
-</body>
+      </div>
+      <div class="col-md-2"></div>
+      <div class="col-md-8 board">
+      </div>
+      <div class="about">
+        <div class="">
+          <img src="" />
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      <div class="col-md-4"></div>
+      <p>Contact us</p>
+      <p>2013 MSTC</p>
+    </footer>
+  </body>
 </html>
