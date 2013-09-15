@@ -7,6 +7,10 @@ from jinja2.exceptions import TemplateNotFound
 import MySQLdb
 
 
+@app.route('/pages')
+def show_pages_list():
+    return render_template('pages.html', pageList = Page.get_pages_list())
+
 @app.route('/pages/<name>')
 def show_page(name):
     try:
