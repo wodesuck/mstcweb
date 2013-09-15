@@ -2,24 +2,24 @@
 {% block other_data_fields %}
 <div class="form-group timeinput">
   <label for="start-time">开始时间</label>
-  <input type="datetime" class="start-time form-control date" id="start-time" data-date-format="yyyy-mm-dd hh:ii:ss" value="{{ start_time }}">
+  <input type="datetime" class="start-time form-control date" id="start-time" name="start_time" data-date-format="yyyy-mm-dd hh:ii:ss" value="{{ start_time }}">
 </div>
 
 <div class="form-group timeinput">
   <label for="end-time">结束时间</label>
-  <input type="datetime" class="end-time form-control date" id="start-time" data-date-format="yyyy-mm-dd hh:ii:ss" value="{{ end_time }}">
+  <input type="datetime" class="end-time form-control date" id="end-time" name="end_time" data-date-format="yyyy-mm-dd hh:ii:ss" value="{{ end_time }}">
 </div>
 
 <div class="form-group">
-  <label for="content-fields">报名表字段（除姓名、邮箱外）</label>
+  <label>报名表字段（除姓名、邮箱外）</label>
   {% for field in content_fields %}
-  <div id="content-fields">
+  <div class="content-fields">
     <input type="text" class="field-name form-control" placeholder="字段名(必填)" value="{{ field.field_name }}">
     <select class="form-control field-type">
       <option value="input" {{ 'selected' if field.field_type == 'input' }}>短文本</option>
       <option value="textarea" {{ 'selected' if field.field_type == 'textarea' }}>长文本</option>
       <option value="number" {{ 'selected' if field.field_type == 'number' }}>数字</option>
-      <option value="bool" {{ 'selected' if field.field_type == 'input' }}>选项</option>
+      <option value="bool" {{ 'selected' if field.field_type == 'bool' }}>选项</option>
     </select>
     {% if field.field_type in ['input', 'textarea'] %}
     <input type="number" class="lower-bound form-control" placeholder="下限(长度或数值)" value="{{ field.min_len }}">
@@ -35,7 +35,7 @@
   </div>
   {% endfor %}
 
-  <div id="content-fields">
+  <div class="content-fields">
     <input type="text" class="field-name form-control" placeholder="字段名(必填)">
     <select class="form-control field-type">
       <option value="input">短文本</option>
@@ -49,4 +49,6 @@
   </div>
   <span class="glyphicon glyphicon-plus"></span>
 </div>
+
+<input type="hidden" name="layout" value="form">
 {% endblock %}

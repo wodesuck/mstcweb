@@ -8,7 +8,7 @@
   });
 </script>
 
-<form id="page_form">
+<form id="edit-form" method="POST">
   <div class="form-group">
     <label for="name">链接地址</label>
     <div class="row">
@@ -30,7 +30,17 @@
 
   {% block other_data_fields %}{% endblock %}
 
-  <button type="submit" class="btn btn-primary" id="edit-form-submit">保&nbsp;存</button>
+  <input type="hidden" name="CSRF_TOKEN" id="CSRF_TOKEN" value="{{ CSRF_TOKEN() }}">
+
+  <div class="row">
+    <div class="col-md-1">
+      <button type="submit" class="btn btn-primary" id="edit-form-submit">保&nbsp;存</button>
+    </div>
+    <div class="col-md-6 edit-form-alert">
+      <div class="alert alert-success"></div>
+      <div class="alert alert-danger"></div>
+    </div>
+  </div>
   <!--
   <div class="row">
     <div class="col-md-2 col-md-offset-5">

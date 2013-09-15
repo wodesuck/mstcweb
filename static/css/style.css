@@ -57,7 +57,7 @@ body
   margin-bottom: 15px;
 }
 
-#content-fields .form-control
+.content-fields .form-control
 {
   display: inline-block;
   width: 23%;
@@ -69,3 +69,12 @@ body
   width: 35%;
 }
 
+#edit-form .alert
+{
+  display: none;
+}
+
+.edit-form-alert
+{
+  margin-left: 15px;
+}

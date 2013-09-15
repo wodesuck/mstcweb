@@ -48,6 +48,9 @@ class Page(object):
 
         Raises `PageNameExist` if `name` duplicated when saving a new record.
         """
+        if not hasattr(self, 'layout') or not self.layout:
+            self.layout = 'default'
+
         keys = self.props[:]
         values = [getattr(self, x) for x in keys]
 

@@ -50,7 +50,10 @@ def admin_pages_new():
     else:
         try:
             name = request.form['name']
-            Page.create(**request.form)
+            Page.create(name = request.form['name'],
+                    title = request.form['title'],
+                    content = request.form['content'],
+                    layout = request.form.get('layout', None))
         except PageNameExist:
             return jsonify(err_code=-1, msg=u'页面名称（%s）已存在' % name)
         except MySQLdb.IntegrityError:
@@ -81,7 +84,10 @@ def admin_pages_edit(name):
     if request.method == 'GET':
         return render_template('admin_pages_edit.html', **page.__dict__)
     else:
-        page.update(**request.form)
+        page.update(name = request.form['name'],
+                    title = request.form['title'],
+                    content = request.form['content'],
+                    layout = request.form.get('layout', None),)
         return jsonify(err_code=0, msg=u'修改保存成功')
 
 

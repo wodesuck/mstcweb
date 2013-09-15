@@ -8,7 +8,7 @@ from datetime import datetime
 from flask import (request, jsonify, render_template, abort)
 
 def _from_datetime_str(datetime_str):
-    return datetime.strptime(datatime_str, '%Y-%m-%d %H:%M:%S')
+    return datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
 
 @app.route('/forms/<name>', methods = ['GET', 'POST'])
 def forms(name):
@@ -84,16 +84,22 @@ def admin_forms_new():
         return render_template('admin_forms_new.html')
 
     else:
-        args = { 'name': request.form['name'], 
+        args = {'name': request.form['name'], 
                 'content_fields': map(lambda x: form.FieldDescription(**x),
                     json.loads(request.form['content_fields'])),
                 'start_time': _from_datetime_str(request.form['start_time']),
                 'end_time': _from_datetime_str(request.form['end_time'])}
         eventObj = form.Event(**args)
 
+        pageObj = page.Page(name = request.form['name'],
+                title = request.form['title'],
+                content = request.form['content'],
+                layout = request.form['layout'],)
+
         try:
             eventObj.save()
-        except form.NameExisted:
+            pageObj.save()
+        except form.NameExisted, page.PageNameExist:
             return jsonify(err_code = -1, msg = u'此报名事件已存在')
         except form.MySQLdb.IntegrityError:
             return jsonify(err_code = -2, msg = u'数据库错误')
@@ -116,7 +122,8 @@ def admin_forms_edit(name):
 
     try:
         eventObj = form.Event.get(name)
-    except form.NoSuchEvent:
+        pageObj = page.Page.get(name)
+    except form.NoSuchEvent, page.NoSuchPage:
         abort(404)
 
     if request.method == 'GET':
@@ -131,6 +138,12 @@ def admin_forms_edit(name):
         eventObj.start_time = _from_datetime_str(request.form['start_time'])
         eventObj.end_time = _from_datetime_str(request.form['end_time'])
         eventObj.save()
+
+        pageObj.update(name = request.form['name'],
+                title = request.form['title'],
+                content = request.form['content'],
+                layout = request.form['layout'],)
+
         return jsonify(err_code = 0, msg = u'修改保存成功')
 
 @app.route('/admin/forms/<name>/delete', methods = ['POST'])
