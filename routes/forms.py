@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from routes import app
 from models import form
+from models import page
 import json
 from common.userauth import check_auth
 from datetime import datetime
@@ -119,7 +120,10 @@ def admin_forms_edit(name):
         abort(404)
 
     if request.method == 'GET':
-        return render_template('admin_forms_edit.html', **eventObj.__dict__)
+        ctx_data = page.Page.get(name).__dict__
+        for k, v in eventObj.__dict__.items():
+            ctx_data[k] = v
+        return render_template('admin_forms_edit.html', **ctx_data)
 
     else:
         eventObj.content_fields = map(lambda x: form.FieldDescription(**x),

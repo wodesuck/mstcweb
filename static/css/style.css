@@ -53,5 +53,19 @@ body
 
 #edit-form-submit
 {
-  margin: 15px;
+  display: block;
+  margin-bottom: 15px;
 }
+
+#content-fields .form-control
+{
+  display: inline-block;
+  width: 23%;
+}
+
+.timeinput
+{
+  display: inline-block;
+  width: 35%;
+}
+

@@ -32,4 +32,10 @@ $(function() {
     e.preventDefault();
     login();
   });
+
+  //Register events for datetime picker
+  $('input.date').datetimepicker({
+    autoclose: true,
+    todayBtn: true,
+  });
 });

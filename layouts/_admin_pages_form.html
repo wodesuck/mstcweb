@@ -24,7 +24,9 @@
     <input type="text" class="form-control" id="title" name="title" value="{{ title }}">
   </div>
 
-  <textarea id="content" name="content">{{ content }}</textarea>
+  <div class="form-group">
+    <textarea id="content" name="content">{{ content }}</textarea>
+  </div>
 
   {% block other_data_fields %}{% endblock %}
 
