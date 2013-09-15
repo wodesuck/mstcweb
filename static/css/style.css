@@ -50,3 +50,31 @@ body
   display: none;
   margin-top: 10px;
 }
+
+#edit-form-submit
+{
+  display: block;
+  margin-bottom: 15px;
+}
+
+.content-fields .form-control
+{
+  display: inline-block;
+  width: 23%;
+}
+
+.timeinput
+{
+  display: inline-block;
+  width: 35%;
+}
+
+#edit-form .alert
+{
+  display: none;
+}
+
+.edit-form-alert
+{
+  margin-left: 15px;
+}

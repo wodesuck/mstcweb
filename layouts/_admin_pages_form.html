@@ -1,0 +1,51 @@
+<script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+<script>
+  tinymce.init({
+    selector: '#content',
+    plugins: ['autoresize', 'charmap', 'lists', 'preview',
+      'table', 'anchor', 'code', 'media', 'contextmenu', 'image', 'paste'],
+    autoresize_min_height: 500,
+  });
+</script>
+
+<form id="edit-form" method="POST">
+  <div class="form-group">
+    <label for="name">链接地址</label>
+    <div class="row">
+      <div class="input-group col-md-3">
+        <span class="input-group-addon">{{ url_for('show_page', name = '') }}</span>
+        <input type="text" class="form-control" id="name" name="name" value="{{ name }}">
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="title">标题</label>
+    <input type="text" class="form-control" id="title" name="title" value="{{ title }}">
+  </div>
+
+  <div class="form-group">
+    <textarea id="content" name="content">{{ content }}</textarea>
+  </div>
+
+  {% block other_data_fields %}{% endblock %}
+
+  <input type="hidden" name="CSRF_TOKEN" id="CSRF_TOKEN" value="{{ CSRF_TOKEN() }}">
+
+  <div class="row">
+    <div class="col-md-1">
+      <button type="submit" class="btn btn-primary" id="edit-form-submit">保&nbsp;存</button>
+    </div>
+    <div class="col-md-6 edit-form-alert">
+      <div class="alert alert-success"></div>
+      <div class="alert alert-danger"></div>
+    </div>
+  </div>
+  <!--
+  <div class="row">
+    <div class="col-md-2 col-md-offset-5">
+      <button type="button" class="btn btn-primary btn-block" id="edit-form-submit">保&nbsp;存</button>
+    </div>
+  </div>
+-->
+</form>

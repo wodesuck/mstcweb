@@ -1,0 +1,54 @@
+{% extends "_admin_pages_form.html" %}
+{% block other_data_fields %}
+<div class="form-group timeinput">
+  <label for="start-time">开始时间</label>
+  <input type="datetime" class="start-time form-control date" id="start-time" name="start_time" data-date-format="yyyy-mm-dd hh:ii:ss" value="{{ start_time }}">
+</div>
+
+<div class="form-group timeinput">
+  <label for="end-time">结束时间</label>
+  <input type="datetime" class="end-time form-control date" id="end-time" name="end_time" data-date-format="yyyy-mm-dd hh:ii:ss" value="{{ end_time }}">
+</div>
+
+<div class="form-group">
+  <label>报名表字段（除姓名、邮箱外）</label>
+  {% for field in content_fields %}
+  <div class="content-fields">
+    <input type="text" class="field-name form-control" placeholder="字段名(必填)" value="{{ field.field_name }}">
+    <select class="form-control field-type">
+      <option value="input" {{ 'selected' if field.field_type == 'input' }}>短文本</option>
+      <option value="textarea" {{ 'selected' if field.field_type == 'textarea' }}>长文本</option>
+      <option value="number" {{ 'selected' if field.field_type == 'number' }}>数字</option>
+      <option value="bool" {{ 'selected' if field.field_type == 'bool' }}>选项</option>
+    </select>
+    {% if field.field_type in ['input', 'textarea'] %}
+    <input type="number" class="lower-bound form-control" placeholder="下限(长度或数值)" value="{{ field.min_len }}">
+    <input type="number" class="upper-bound form-control" placeholder="上限(长度或数值)" value="{{ field.max_len }}">
+    {% elif field.field_type == 'number' %}
+    <input type="number" class="lower-bound form-control" placeholder="下限(长度或数值)" value="{{ field.min_val }}">
+    <input type="number" class="upper-bound form-control" placeholder="上限(长度或数值)" value="{{ field.max_val }}">
+    {% else %}
+    <input type="number" class="lower-bound form-control" placeholder="下限(长度或数值)">
+    <input type="number" class="upper-bound form-control" placeholder="上限(长度或数值)">
+    {% endif %}
+    <span class="glyphicon glyphicon-remove"></span>
+  </div>
+  {% endfor %}
+
+  <div class="content-fields">
+    <input type="text" class="field-name form-control" placeholder="字段名(必填)">
+    <select class="form-control field-type">
+      <option value="input">短文本</option>
+      <option value="textarea">长文本</option>
+      <option value="number">数字</option>
+      <option value="bool">选项</option>
+    </select>
+    <input type="number" class="lower-bound form-control" placeholder="下限(长度或数值)">
+    <input type="number" class="upper-bound form-control" placeholder="上限(长度或数值)">
+    <span class="glyphicon glyphicon-remove"></span>
+  </div>
+  <span class="glyphicon glyphicon-plus"></span>
+</div>
+
+<input type="hidden" name="layout" value="form">
+{% endblock %}
