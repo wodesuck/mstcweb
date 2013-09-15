@@ -39,6 +39,10 @@ def init_db():
     g.conn = connect_db()
     g.cursor = g.conn.cursor()
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/admin')
 def admin_index():
     if check_auth():
