@@ -36,7 +36,7 @@ function save_form() {
   });
 
   var content_fields = [];
-  $('.content-fields').each(function(i, v) {
+  $('.content-field').each(function(i, v) {
     var field = $(v);
     var field_data = {
       field_name: field.children('.field-name').val(),
@@ -45,13 +45,19 @@ function save_form() {
     if(!field_data.field_name)
       return true;
 
+    var lower = field.children('.lower-bound').val();
+    var upper = field.children('.upper-bound').val();
     if(field_data.field_type == 'input' || field_data.field_type == 'textarea') {
-      field_data.min_len = field.children('.lower-bound').val();
-      field_data.max_len = field.children('.upper-bound').val();
+      if(lower)
+        field_data.min_len = lower;
+      if(upper)
+        field_data.max_len = upper;
     }
     if(field_data.field_type == 'number') {
-      field_data.min_val = field.children('.lower-bound').val();
-      field_data.max_val = field.children('.upper-bound').val();
+      if(lower)
+        field_data.min_val = lower;
+      if(upper)
+        field_data.max_val = upper;
     }
 
     content_fields.push(field_data);
@@ -89,5 +95,18 @@ $(function() {
   $('#edit-form').submit(function(e) {
     e.preventDefault();
     save_form();
+  });
+
+  $('.content-fields .remove-field').click(function() {
+    $(this).parent().remove();
+  });
+
+  $('.content-fields .add-field').click(function() {
+    var field_form = $('.content-field').last().clone();
+    field_form.children('.form-control').val('');
+    field_form.children('.remove-field').click(function() {
+      field_form.remove();
+    });
+    $('.content-field').last().after(field_form);
   });
 });
