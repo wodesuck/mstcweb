@@ -94,7 +94,7 @@ def admin_forms_new():
         pageObj = page.Page(name = request.form['name'],
                 title = request.form['title'],
                 content = request.form['content'],
-                layout = request.form['layout'],)
+                layout = "form_page")
 
         try:
             eventObj.save()
