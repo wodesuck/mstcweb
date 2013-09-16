@@ -33,17 +33,24 @@ def forms(name):
     if request.method == 'GET':
         return render_template('form.html', **eventObj.__dict__)
     else:
+        new_token = gen_csrf_token(True)
         try:
             form_id = eventObj.submit(
                     request.form['name'],
                     request.form['email'],
                     request.form.getlist('content[]'))
         except form.InvalidSubmit:
-            return jsonify(err_code = -1, msg = u'提交内容无效')
+            return jsonify(err_code = -1,
+                    msg = u'提交内容无效',
+                    new_token = new_token)
         except form.NotStartYet:
-            return jsonify(err_code = -2, msg = u'该报名时间尚未开始')
+            return jsonify(err_code = -2,
+                    msg = u'该报名时间尚未开始',
+                    new_token = new_token)
         except form.Ended:
-            return jsonify(err_code = -3, msg = u'该报名时间已结束')
+            return jsonify(err_code = -3,
+                    msg = u'该报名时间已结束',
+                    new_token = new_token)
         else:
             return jsonify(err_code = 0,
                     msg = u'报名成功！报名编号：%d' % form_id)

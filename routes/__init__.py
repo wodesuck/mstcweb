@@ -15,7 +15,7 @@ app.secret_key = SESSION_KEY
 def init():
     init_db()
 
-    if (request.method in ['POST', 'PUT'] and
+    if (request.method == 'POST' and
             request.endpoint not in csrf_white_list):
         s_token = session.pop('CSRF_TOKEN', None)
         r_token = request.form.get('CSRF_TOKEN',

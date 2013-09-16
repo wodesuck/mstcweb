@@ -83,6 +83,7 @@
                 else {
                     $("#errmsg")[0].textContent = response.msg;
                     $("#submit")[0].disabled = false;
+					$("#csrf").val(response.new_token);
                 }
             }, "json");
     }
