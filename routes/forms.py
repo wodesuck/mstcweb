@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-from routes import app
+from routes import app, gen_csrf_token
 from models import form
 from models import page
 import json

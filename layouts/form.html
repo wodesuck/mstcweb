@@ -54,7 +54,7 @@
       <div class="container pull-left">
         <p class="text-warning" id="errmsg"></p>
       </div>
-      <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal" id="cancel">取消</button>
       <button type="button" class="btn btn-primary" id="submit" onclick="postForm();">提交报名</button>
     </div>
   </div>
@@ -79,6 +79,7 @@
                 if (response.err_code == 0) {
                     $("#formbody").remove();
                     $("#sucmsg")[0].textContent = response.msg;
+					$("#cancel").text("关闭");
                 }
                 else {
                     $("#errmsg")[0].textContent = response.msg;
