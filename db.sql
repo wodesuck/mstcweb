@@ -9,7 +9,7 @@ CREATE TABLE pages (
 
     PRIMARY KEY (id),
     UNIQUE (name)
-);
+) DEFAULT CHARSET=utf8;
 
 CREATE TABLE `events` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,

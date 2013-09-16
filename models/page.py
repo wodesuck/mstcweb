@@ -62,7 +62,7 @@ class Page(object):
             keys += ['created_time', 'updated_time']
             values += [None, None]
 
-            sql = ("INSERT INTO pages (%s) VALUES (%s)" %
+            sql = (u"INSERT INTO pages (%s) VALUES (%s)" %
                    (','.join(keys), ('%s,' * len(keys))[0:-1]))
             try:
                 g.cursor.execute(sql, tuple(values))
