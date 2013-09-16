@@ -5,7 +5,8 @@
   <div class="container">
     <h1>{{ title }}</h1>
     {{ content|safe }}
-    {% block form %}{% endblock %}
+    {% block button %}{% endblock %}
   </div>
 </div>
+{% block form %}{% endblock %}
 {% endblock %}

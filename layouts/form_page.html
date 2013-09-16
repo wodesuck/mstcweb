@@ -1,6 +1,8 @@
 {% extends "pure_page.html" %}
-{% block form %}
+{% block button %}
 <a data-toggle="modal" href="/forms/{{ name }}" data-target="#form" class="btn btn-primary btn-lg">点击这里参与报名</a>
+{% endblock %}
+{% block form %}
 <div class="modal fade" id="form" tabindex="-1" role="dialog" aria-labelledby="formLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -9,6 +11,9 @@
         <h4 class="modal-title">报名表</h4>
       </div>
       <div class="modal-body">
+        <div class="container">
+          <iframe src="/forms/{{ name }}"></iframe>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
