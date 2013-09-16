@@ -11,6 +11,13 @@ import MySQLdb
 def show_pages_list():
     return render_template('pages.html', pageList = Page.get_pages_list())
 
+@app.route('/about/<name>')
+def about():
+    """
+    Static pages.
+    """
+    return render_template('%s.html' % name)
+
 @app.route('/pages/<name>')
 def show_page(name):
     try:
