@@ -16,11 +16,12 @@
       {% endfor %}
     </ul>
   </div>
+
   <div class="col-md-3">
     <div data-spy="affix" data-offset-top="150">
       <ul class="list-group">
         {% for page in pageList %}
-  	  <li class="list-group-item"><a href="/pages/{{ page.name }}">{{ page.title }}</a></li>
+        <li class="list-group-item"><a href="/pages/{{ page.name }}">{{ page.title }}</a></li>
         {% endfor %}
       </ul>
     </div>

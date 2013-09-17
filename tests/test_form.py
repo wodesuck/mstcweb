@@ -18,7 +18,7 @@ formFields.append(form.FieldDescription(u'长文本', 'textarea'))
 formFields.append(form.FieldDescription(u'数字(-10 - 10)', 'number', min_val = -10, max_val = 10))
 formFields.append(form.FieldDescription(u'布尔', 'bool'))
 
-validSubmitContent = [u'短文本内容', u'长文本内容', 5, True]
+validSubmitContent = [u'短文本内容', u'长文本内容', '5', True]
 
 content_fields_str = json.dumps(map(lambda x: x.to_dict(), formFields))
 before = (now - timeDelta).strftime('%Y-%m-%d %H:%M:%S')
@@ -156,16 +156,16 @@ def testSubmitFormInvalidTextLength():
     eventObj = form.Event.get('testForm')
     assert_raises(form.InvalidSubmit, eventObj.submit,
             u'测试', 'abc.def+ghi@mail2.sysu.edu.cn',
-            [u'过短', u'长文本内容', 5, True])
+            [u'过短', u'长文本内容', '5', True])
     assert_raises(form.InvalidSubmit, eventObj.submit,
             u'测试', 'abc.def+ghi@mail2.sysu.edu.cn',
-            [u'过长过长过长过长过长过长', u'长文本内容', 5, True])
+            [u'过长过长过长过长过长过长', u'长文本内容', '5', True])
 
 def testSubmitFormInvalidNumber():
     eventObj = form.Event.get('testForm')
     assert_raises(form.InvalidSubmit, eventObj.submit,
             u'测试', 'abc.def+ghi@mail2.sysu.edu.cn',
-            [u'短文本内容', u'长文本内容', -20, True])
+            [u'短文本内容', u'长文本内容', '-20', True])
 
 def testSubmitFormNotStarted():
     eventObj = form.Event.get('testFormNotStarted')
