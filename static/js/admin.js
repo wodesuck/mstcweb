@@ -135,7 +135,38 @@ function show_query_forms_result(result) {
   });
 }
 
+function delete_page(name, ensure) {
+  if(ensure)
+    $.post('/admin/pages/' + name + '/delete', function(respon) {
+      if(respon.err_code == 0)
+        $('button.delete-page[data-name="' + name + '"]').parents('tr').remove();
+    });
+
+  $('button.delete-page[data-name="' + name + '"]').popover('hide');
+}
+
+function delete_form(name, ensure) {
+  if(ensure)
+    $.post('/admin/forms/' + name + '/delete', function(respon) {
+      if(respon.err_code == 0) {
+        $('button.delete-form[data-name="' + name + '"]').parents('tr').remove();
+        delete_page(name, ensure);
+      }
+    });
+
+  $('button.delete-form[data-name="' + name + '"]').popover('hide');
+}
+
 $(function() {
+  //Register ajaxPrefilter for CSRF protection
+  $.ajaxPrefilter(function(options, oriOptions, jqXHR) {
+    if(oriOptions.type == 'post') {
+      cookie_match = document.cookie.match(/X-CSRFToken=(.+)/);
+      if(cookie_match)
+        jqXHR.setRequestHeader('X-CSRFToken', cookie_match[1]);
+    }
+  });
+
   //Register events for login page
   $('#main-login-form button').click(function(e) {
     e.preventDefault();
@@ -175,4 +206,31 @@ $(function() {
   $('#query-by-form-id button').click(function() {
     query_forms('form_id');
   })
+
+  //Register events for the delete buttons
+  $('button.delete-page').each(function(i, v) {
+    $(v).popover({
+      html: true,
+      placement: 'bottom',
+      title: '删除确认',
+      container: 'body',
+      content: format_string('<p>55555不要删我～～～</p>\
+                             <button class="btn btn-default" onclick="delete_page(\'{name}\', true);">删掉</button>\
+                             <button class="btn btn-primary" onclick="delete_page(\'{name}\', false);">放开他</button>',
+                             {name: $(v).data('name')})
+    });
+  });
+
+  $('button.delete-form').each(function(i, v) {
+    $(v).popover({
+      html: true,
+      placement: 'bottom',
+      title: '删除确认',
+      container: 'body',
+      content: format_string('<p>55555不要删我～～～</p>\
+                             <button class="btn btn-default" onclick="delete_form(\'{name}\', true);">删掉</button>\
+                             <button class="btn btn-primary" onclick="delete_form(\'{name}\', false);">放开他</button>',
+                             {name: $(v).data('name')})
+    });
+  });
 });

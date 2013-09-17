@@ -18,8 +18,10 @@ def init():
     if (request.method in ['POST', 'PUT'] and
             request.endpoint not in csrf_white_list):
         s_token = session.pop('CSRF_TOKEN', None)
-        r_token = request.form.get('CSRF_TOKEN',
-                request.headers.get('X-CSRFToken'))
+        r_token = request.form.get('CSRF_TOKEN', None)
+        if not r_token:
+            r_token = request.headers.get('X-CSRFToken', None)
+            gen_csrf_token()
 
         if not s_token or s_token != r_token:
             abort(403)

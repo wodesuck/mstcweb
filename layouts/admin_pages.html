@@ -29,7 +29,7 @@
       <td>
         <div class="btn-group btn-group-xs">
           <a class="btn btn-primary" href="{{ url_for('admin_pages_edit', name = item.name) }}"><span class="glyphicon glyphicon-edit"></span> 修改</a>
-          <button class="btn btn-danger" data-id="{{ item.id }}"><span class="glyphicon glyphicon-remove"></span> 删除</button>
+          <button class="btn btn-danger delete-page" data-name="{{ item.name }}"><span class="glyphicon glyphicon-remove"></span> 删除</button>
         </div>
       </td>
     </tr>
