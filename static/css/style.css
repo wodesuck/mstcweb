@@ -57,7 +57,7 @@ body
   margin-bottom: 15px;
 }
 
-.content-fields .form-control
+.content-field .form-control
 {
   display: inline-block;
   width: 23%;
@@ -69,14 +69,26 @@ body
   width: 35%;
 }
 
-#edit-form .alert
-{
-  display: none;
-}
-
 .edit-form-alert
 {
   margin-left: 15px;
+}
+
+.edit-form-alert .alert
+{
+  padding-top: 5px;
+  padding-bottom: 5px;
+  display: none;
+}
+
+#query-by-event-name, #query-by-form-id
+{
+  margin-top: 15px;
+}
+
+#forms-query-result
+{
+  margin-top: 15px;
 }
 
 #logo

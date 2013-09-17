@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-from routes import app
+from routes import app, gen_csrf_token
 from models.page import Page, NoSuchPage, PageNameExist
 from common.userauth import check_auth
 from flask import render_template, abort, jsonify, request
@@ -66,9 +66,11 @@ def admin_pages_new():
                     content = request.form['content'],
                     layout = "pure_page")
         except PageNameExist:
+            gen_csrf_token()
             return jsonify(err_code=-1, msg=u'页面名称（%s）已存在' % name)
         except MySQLdb.IntegrityError:
-            return jsonify(err_code=-1, msg=u'数据库错误')
+            gen_csrf_token()
+            return jsonify(err_code=-2, msg=u'数据库错误')
 
         return jsonify(err_code=0, msg=u'页面新建成功')
 
@@ -98,7 +100,7 @@ def admin_pages_edit(name):
         page.update(name = request.form['name'],
                     title = request.form['title'],
                     content = request.form['content'],
-                    layout = request.form.get('layout', None),)
+                    layout = 'pure_page')
         return jsonify(err_code=0, msg=u'修改保存成功')
 
 

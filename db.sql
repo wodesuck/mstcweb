@@ -14,7 +14,7 @@ CREATE TABLE pages (
 CREATE TABLE `events` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(64) NOT NULL,
-    `content_fields` VARCHAR(512) NOT NULL,
+    `content_fields` VARCHAR(4096) NOT NULL,
     `start_time` TIMESTAMP NOT NULL DEFAULT 0,
     `end_time` TIMESTAMP NOT NULL DEFAULT 0,
     `created_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

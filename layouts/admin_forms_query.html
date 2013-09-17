@@ -5,7 +5,34 @@
 <div class="jumbotron" style="height: 100%;">
   <div class="container">
     <h1>报名表查询</h1>
-    <h2>Jie Cao For sale</h2>
   </div>
+</div>
+
+<ul class="nav nav-tabs" id="forms-query-tab">
+  <li class="active"><a href="#query-by-event-name" data-toggle="tab">根据报名事件</a></li>
+  <li><a href="#query-by-form-id" data-toggle="tab">根据报名表编号</a></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active row" id="query-by-event-name">
+    <div class="col-md-5">
+      <select class="form-control">
+        {% for event in events_list %}
+        <option value="{{ event['name'] }}">{{ event['title'] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="btn btn-default">查询</button>
+  </div>
+
+  <div class="tab-pane row" id="query-by-form-id">
+    <div class="col-md-5">
+      <input class="form-control" placeholder="报名表编号">
+    </div>
+    <button class="btn btn-default">查询</button>
+  </div>
+</div>
+
+<div id="forms-query-result">
 </div>
 {% endblock %}

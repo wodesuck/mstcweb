@@ -36,7 +36,7 @@ function save_form() {
   });
 
   var content_fields = [];
-  $('.content-fields').each(function(i, v) {
+  $('.content-field').each(function(i, v) {
     var field = $(v);
     var field_data = {
       field_name: field.children('.field-name').val(),
@@ -45,24 +45,30 @@ function save_form() {
     if(!field_data.field_name)
       return true;
 
+    var lower = field.children('.lower-bound').val();
+    var upper = field.children('.upper-bound').val();
     if(field_data.field_type == 'input' || field_data.field_type == 'textarea') {
-      field_data.min_len = field.children('.lower-bound').val();
-      field_data.max_len = field.children('.upper-bound').val();
+      if(lower)
+        field_data.min_len = lower;
+      if(upper)
+        field_data.max_len = upper;
     }
     if(field_data.field_type == 'number') {
-      field_data.min_val = field.children('.lower-bound').val();
-      field_data.max_val = field.children('.upper-bound').val();
+      if(lower)
+        field_data.min_val = lower;
+      if(upper)
+        field_data.max_val = upper;
     }
 
     content_fields.push(field_data);
   });
 
-  if(content_fields.length)
-    data.content_fields = JSON.stringify(content_fields);
+  data.content_fields = JSON.stringify(content_fields);
 
   $.post(location.href, data, function(respon) {
     if(respon.err_code == 0) {
       $('#edit-form .alert-success').text(respon.msg).show(200);
+      setTimeout(function() {location.reload() }, 800);
     }
     else {
       $('#edit-form .alert-danger').text(respon.msg).show(200);
@@ -72,7 +78,101 @@ function save_form() {
   });
 }
 
+function query_forms(by) {
+  if(by == 'event_name') {
+    var event_name = $('#query-by-event-name select').val();
+
+    $.get('/admin/forms/' + event_name + '/query', function(respon) {
+      if(respon.err_code == 0)
+        show_query_forms_result(respon.result);
+    }).fail(function() {
+      show_query_forms_result([]);
+    })
+  }
+  else if(by == 'form_id') {
+    var form_id = $('#query-by-form-id input').val();
+
+    $.get('/admin/forms/query/' + form_id, function(respon) {
+      if(respon.err_code == 0)
+        show_query_forms_result([respon.result]);
+    }).fail(function() {
+      show_query_forms_result([]);
+    });
+  }
+}
+
+function format_string(str, data) {
+  return str.replace(/\{(.+?)\}/g, function(s, k) { return data[k]; });
+}
+
+function show_query_forms_result(result) {
+  $('#forms-query-result').empty();
+  if(!result.length) {
+    $('#forms-query-result').append(
+      $.parseHTML('<div class="alert alert-warning">找不到对应的结果！</div>')
+    );
+  }
+  $.each(result, function(i, form) {
+    var content = [];
+    $.each(form.content, function(i, v) {
+      content.push(
+        format_string('<li>{name}：{value}</li>',
+                      { name: v[0], value: v[1] }));
+    });
+    form.other = content.join('\n');
+
+    var form_str = '\
+    <div class="panel panel-default">\
+    <div class="panel-heading"><h3 class="panel-title">{name}</h3></div>\
+    <div class="panel-body">\
+    <ul>\
+    <li>报名表编号：{form_id}</li>\
+    <li>电子邮件：{email}</li>\
+    <li>报名时间：{created_time}</li>\
+    {other}\
+    </div>';
+    $('#forms-query-result').append($.parseHTML(format_string(form_str, form)));
+  });
+}
+
+function delete_page(name, ensure) {
+  if(ensure)
+    $.post('/admin/pages/' + name + '/delete', function(respon) {
+      if(respon.err_code == 0)
+        $('button.delete-page[data-name="' + name + '"]').parents('tr').remove();
+    });
+
+  $('button.delete-page[data-name="' + name + '"]').popover('toggle');
+}
+
+function delete_form(name, ensure) {
+  if(ensure)
+    $.post('/admin/forms/' + name + '/delete', function(respon) {
+      if(respon.err_code == 0) {
+        $('button.delete-form[data-name="' + name + '"]').parents('tr').remove();
+        delete_page(name, ensure);
+      }
+    });
+
+  $('button.delete-form[data-name="' + name + '"]').popover('toggle');
+}
+
 $(function() {
+  //Register ajaxPrefilter for CSRF protection
+  $.ajaxPrefilter(function(options, oriOptions, jqXHR) {
+    if(oriOptions.type == 'post') {
+      var cookies = document.cookie.split(';');
+      var cookie_match = false;
+      for(var i = 0; i < cookies.length; ++i) {
+        cookie_match = cookies[i].trim().match(/X-CSRFToken=(.+)/);
+        if(cookie_match)
+          break;
+      }
+      if(cookie_match)
+        jqXHR.setRequestHeader('X-CSRFToken', cookie_match[1]);
+    }
+  });
+
   //Register events for login page
   $('#main-login-form button').click(function(e) {
     e.preventDefault();
@@ -85,9 +185,58 @@ $(function() {
     todayBtn: true,
   });
 
-  //Register events for the forms
+  //Register events for the edit page
   $('#edit-form').submit(function(e) {
     e.preventDefault();
     save_form();
+  });
+
+  $('.content-fields .remove-field').click(function() {
+    $(this).parent().remove();
+  });
+
+  $('.content-fields .add-field').click(function() {
+    var field_form = $('.content-field').last().clone();
+    field_form.children('.form-control').val('');
+    field_form.children('.remove-field').click(function() {
+      field_form.remove();
+    });
+    $('.content-field').last().after(field_form);
+  });
+
+  //Register events for the query page
+  $('#query-by-event-name button').click(function() {
+    query_forms('event_name');
+  })
+
+  $('#query-by-form-id button').click(function() {
+    query_forms('form_id');
+  })
+
+  //Register events for the delete buttons
+  $('button.delete-page').each(function(i, v) {
+    $(v).popover({
+      html: true,
+      placement: 'bottom',
+      title: '删除确认',
+      container: 'body',
+      content: format_string('<p>55555不要删我～～～</p>\
+                             <button class="btn btn-default" onclick="delete_page(\'{name}\', true);">删掉</button>\
+                             <button class="btn btn-primary" onclick="delete_page(\'{name}\', false);">放开他</button>',
+                             {name: $(v).data('name')})
+    });
+  });
+
+  $('button.delete-form').each(function(i, v) {
+    $(v).popover({
+      html: true,
+      placement: 'bottom',
+      title: '删除确认',
+      container: 'body',
+      content: format_string('<p>55555不要删我～～～</p>\
+                             <button class="btn btn-default" onclick="delete_form(\'{name}\', true);">删掉</button>\
+                             <button class="btn btn-primary" onclick="delete_form(\'{name}\', false);">放开他</button>',
+                             {name: $(v).data('name')})
+    });
   });
 });

@@ -10,10 +10,10 @@
   <input type="datetime" class="end-time form-control date" id="end-time" name="end_time" data-date-format="yyyy-mm-dd hh:ii:ss" value="{{ end_time }}">
 </div>
 
-<div class="form-group">
+<div class="form-group content-fields">
   <label>报名表字段（除姓名、邮箱外）</label>
   {% for field in content_fields %}
-  <div class="content-fields">
+  <div class="content-field">
     <input type="text" class="field-name form-control" placeholder="字段名(必填)" value="{{ field.field_name }}">
     <select class="form-control field-type">
       <option value="input" {{ 'selected' if field.field_type == 'input' }}>短文本</option>
@@ -31,11 +31,11 @@
     <input type="number" class="lower-bound form-control" placeholder="下限(长度或数值)">
     <input type="number" class="upper-bound form-control" placeholder="上限(长度或数值)">
     {% endif %}
-    <span class="glyphicon glyphicon-remove"></span>
+    <span class="glyphicon glyphicon-remove remove-field"></span>
   </div>
   {% endfor %}
 
-  <div class="content-fields">
+  <div class="content-field">
     <input type="text" class="field-name form-control" placeholder="字段名(必填)">
     <select class="form-control field-type">
       <option value="input">短文本</option>
@@ -45,8 +45,8 @@
     </select>
     <input type="number" class="lower-bound form-control" placeholder="下限(长度或数值)">
     <input type="number" class="upper-bound form-control" placeholder="上限(长度或数值)">
-    <span class="glyphicon glyphicon-remove"></span>
+    <span class="glyphicon glyphicon-remove remove-field"></span>
   </div>
-  <span class="glyphicon glyphicon-plus"></span>
+  <span class="glyphicon glyphicon-plus add-field"></span>
 </div>
 {% endblock %}
