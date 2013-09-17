@@ -5,7 +5,7 @@
       <h4 class="modal-title">报名表</h4>
     </div>
     <div class="modal-body">
-      <h1 class="text-success" id="sucmsg"></h1>
+      <h3 class="text-success text-center" id="sucmsg"></h3>
       <div class="container" id="formbody">
         <input type="hidden" id="csrf" value={{ CSRF_TOKEN() }}>
         <form class="form-inline" role="form">
@@ -25,7 +25,7 @@
           <div class="form-group">
             <label>{{ field.field_name }}</label>
             <input type="text" class="form-control content">
-          <div>
+          </div>
           {% endif %}
           {% if field.field_type == "textarea" %}
           <div class="form-group">
