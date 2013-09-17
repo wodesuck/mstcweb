@@ -35,16 +35,14 @@
 
     <div class="container">
       <div class="row">
-        <img class="col-md-8" id="logo" src="/static/img/logo.png"/>
+        <img class="col-md-7" id="logo" src="/static/img/logo.png"/>
       </div>
       {% block main %}{% endblock %}
     </div>
 
     <footer>
       <div class="container">
-        <div class="col-md-4"></div>
-        <span class="col-md-4">&copy SYSU MSTC 2013.All rights reserved</span>
-        <div class="col-md-4"></div>
+        <p class="text-center">&copy SYSU MSTC 2013.All rights reserved</p>
       </div>
     </footer>
     <script>$("#{% block active %}{% endblock %}").addClass("active");</script>

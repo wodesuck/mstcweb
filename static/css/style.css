@@ -81,70 +81,70 @@ body
 
 #logo
 {
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 }
 
 .bg-color-green{
-	background-color: #00a300;
+  background-color: #00a300;
 }
 .bg-color-yellow{
-	background-color: #f6dc00;
+  background-color: #f6dc00;
 }
 .bg-color-blue{
-	background-color: #1f469e;
+  background-color: #1f469e;
 }
 .bg-color-lightred{
-	background-color: #9b0e0e;
+  background-color: #9b0e0e;
 }
 .bg-color-darkgreen{
-	background-color: #006400;
+  background-color: #006400;
 }
 .bg-color-darkyellow{
-	background-color: #c48b04;
+  background-color: #c48b04;
 }
 .bg-color-darkred{
-	background-color: #510b0b;
+  background-color: #510b0b;
 }
 .bg-color-darkblue{
-	background-color: #11285d;
+  background-color: #11285d;
 }
 
 .carousel .carousel-indicators li{
-	width: 20px;
-	height: 20px;
-
-	background-color: #ffffff;
-	border: none;
-	margin: 1px 5px;
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff;
+  border: none;
+  margin: 1px 5px;
 }
 .carousel .carousel-indicators .active{
-	background-color: #1f469e;
+  background-color: #1f469e;
 }
 .carousel .carousel-inner img{
-	width: 100%;
-	height: 420px;
+  width: 100%;
+  height: 420px;
 }
 
-.about .bar{
-	width: 100%;
-	height: 300px;
-	margin-top: 50px;
+.about
+{
+  margin-top: 50px;
 }
 .about .bar p{
-	color: #ffffff;
-	//font-family: Segoe UI Light;
-	font-size: 40px;
-    line-height: 300px;
-}
-.about .bar p.right{
-	text-align: center;
+  color: #ffffff;
+  font-size: 40px;
+  line-height: 300px;
+  text-align: center;
 }
 .about .col-md-8{
-	margin-top: 25px;
-	margin-bottom: 25px;
-	height: 250px;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  height: 250px;
 }
 .about .col-md-8 img{
-	height: 210px;
-	margin: 20px 0;
+  height: 210px;
+  margin: 20px 0;
+}
+
+footer
+{
+  margin-top: 50px;
 }
