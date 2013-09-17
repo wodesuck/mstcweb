@@ -1,5 +1,9 @@
 {% extends "frame.html" %}
+{% if name == "about" %}
+{% block active %}about{% endblock %}
+{% else %}
 {% block active %}pages{% endblock %}
+{% endif %}
 {% block main %}
 <div class="jumbotron">
   <div class="container">
