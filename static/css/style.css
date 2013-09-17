@@ -78,3 +78,13 @@ body
 {
   margin-left: 15px;
 }
+
+#query-by-event-name, #query-by-form-id
+{
+  margin-top: 15px;
+}
+
+#forms-query-result
+{
+  margin-top: 15px;
+}

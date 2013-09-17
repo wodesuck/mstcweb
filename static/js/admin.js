@@ -78,6 +78,63 @@ function save_form() {
   });
 }
 
+function query_forms(by) {
+  if(by == 'event_name') {
+    var event_name = $('#query-by-event-name select').val();
+
+    $.get('/admin/forms/' + event_name + '/query', function(respon) {
+      if(respon.err_code == 0)
+        show_query_forms_result(respon.result);
+    }).fail(function() {
+      show_query_forms_result([]);
+    })
+  }
+  else if(by == 'form_id') {
+    var form_id = $('#query-by-form-id input').val();
+
+    $.get('/admin/forms/query/' + form_id, function(respon) {
+      if(respon.err_code == 0)
+        show_query_forms_result([respon.result]);
+    }).fail(function() {
+      show_query_forms_result([]);
+    });
+  }
+}
+
+function format_string(str, data) {
+  return str.replace(/\{(.+?)\}/g, function(s, k) { return data[k]; });
+}
+
+function show_query_forms_result(result) {
+  $('#forms-query-result').empty();
+  if(!result.length) {
+    $('#forms-query-result').append(
+      $.parseHTML('<div class="alert alert-warning">找不到对应的结果！</div>')
+    );
+  }
+  $.each(result, function(i, form) {
+    var content = [];
+    $.each(form.content, function(i, v) {
+      content.push(
+        format_string('<li>{name}：{value}</li>',
+                      { name: v[0], value: v[1] }));
+    });
+    form.other = content.join('\n');
+
+    var form_str = '\
+    <div class="panel panel-default">\
+    <div class="panel-heading"><h3 class="panel-title">{name}</h3></div>\
+    <div class="panel-body">\
+    <ul>\
+    <li>报名表编号：{form_id}</li>\
+    <li>电子邮件：{email}</li>\
+    <li>报名时间：{created_time}</li>\
+    {other}\
+    </div>';
+    $('#forms-query-result').append($.parseHTML(format_string(form_str, form)));
+  });
+}
+
 $(function() {
   //Register events for login page
   $('#main-login-form button').click(function(e) {
@@ -91,7 +148,7 @@ $(function() {
     todayBtn: true,
   });
 
-  //Register events for the forms
+  //Register events for the edit page
   $('#edit-form').submit(function(e) {
     e.preventDefault();
     save_form();
@@ -109,4 +166,13 @@ $(function() {
     });
     $('.content-field').last().after(field_form);
   });
+
+  //Register events for the query page
+  $('#query-by-event-name button').click(function() {
+    query_forms('event_name');
+  })
+
+  $('#query-by-form-id button').click(function() {
+    query_forms('form_id');
+  })
 });

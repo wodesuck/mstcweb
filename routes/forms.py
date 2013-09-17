@@ -61,7 +61,8 @@ def admin_forms_query():
     if not check_auth():
         abort(403)
 
-    return render_template('admin_forms_query.html')
+    return render_template('admin_forms_query.html',
+            events_list = form.Event.get_events_list())
 
 @app.route('/admin/forms/new', methods = ['GET', 'POST'])
 def admin_forms_new():
@@ -159,7 +160,7 @@ def admin_forms_delete(name):
     return jsonify(err_code = 0, msg = u'报名事件（%s）已删除' % name)
 
 @app.route('/admin/forms/<name>/query')
-def admin_forms_query_by_form_name(name):
+def admin_forms_query_by_event_name(name):
     """
     Query forms of a specific event.
     Administrator should have logged in to access this page.
@@ -187,11 +188,14 @@ def admin_forms_query_by_form_name(name):
         if status is not None:
             status = int(status)
     except ValueError:
-        abort(404)
+        abort(400)
+
+    field_names = [field.field_name for field in eventObj.content_fields]
 
     forms = eventObj.query(items, page, status)
     for formObj in forms:
         formObj.created_time = formObj.created_time.strftime('%Y-%m-%d %H:%M:%S')
+        formObj.content = zip(field_names, formObj.content)
     return jsonify(err_code = 0, result = [formObj.__dict__ for formObj in forms])
 
 @app.route('/admin/forms/query/<int:form_id>')
@@ -207,8 +211,12 @@ def admin_forms_query_by_id(form_id):
 
     try:
         formObj = form.Event.query_one(form_id)
-    except form.NoSuchForm:
+        eventObj = form.Event.get(formObj.event_id)
+    except form.NoSuchForm, form.NoSuchEvent:
         abort(404)
+
+    field_names = [field.field_name for field in eventObj.content_fields]
+    formObj.content = zip(field_names, formObj.content)
 
     formObj.created_time = formObj.created_time.strftime('%Y-%m-%d %H:%M:%S')
     return jsonify(err_code = 0, result = formObj.__dict__)

@@ -141,7 +141,7 @@ class Event(object):
         return FormData(*g.cursor.fetchone())
 
     @classmethod
-    def get(cls, name):
+    def get(cls, name_or_id):
         """
         Fetch data from database then create a form model object according to
         the event name.
@@ -152,8 +152,12 @@ class Event(object):
         fields_name = ['id', 'name', 'content_fields',
                 'start_time', 'end_time', 'created_time']
 
-        sql = "SELECT %s FROM `events` WHERE `name` = %s" % (
-                ', '.join(fields_name), MySQLdb.string_literal(name))
+        if isinstance(name_or_id, int) or isinstance(name_or_id, long):
+            sql = "SELECT %s FROM `events` WHERE `id` = %s"
+        else:
+            sql = "SELECT %s FROM `events` WHERE `name` = %s"
+        sql = sql % (', '.join(fields_name), MySQLdb.string_literal(name_or_id))
+
         if not g.cursor.execute(sql):
             raise NoSuchEvent
 
