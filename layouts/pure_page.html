@@ -3,7 +3,8 @@
 {% block main %}
 <div class="jumbotron">
   <div class="container">
-    <h1>{{ title }}</h1>
+    <h1 class="text-center">{{ title }}</h1>
+    <br>
     {{ content|safe }}
     {% block button %}{% endblock %}
   </div>
