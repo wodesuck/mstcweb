@@ -45,8 +45,8 @@ function save_form() {
     if(!field_data.field_name)
       return true;
 
-    var lower = field.children('.lower-bound').val();
-    var upper = field.children('.upper-bound').val();
+    var lower = Number(field.children('.lower-bound').val());
+    var upper = Number(field.children('.upper-bound').val());
     if(field_data.field_type == 'input' || field_data.field_type == 'textarea') {
       if(lower)
         field_data.min_len = lower;

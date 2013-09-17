@@ -74,7 +74,7 @@
             CSRF_TOKEN: $("#csrf").val(),
             name: $("#name").val(),
             email: $("#email").val(),
-            content: content
+            content: JSON.stringify(content)
             }, function(response) {
                 if (response.err_code == 0) {
                     $("#formbody").remove();

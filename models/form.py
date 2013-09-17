@@ -1,7 +1,7 @@
 import MySQLdb
 import json, re
 from datetime import datetime
-from flask import g
+from flask import g, escape
 
 __all__ = ['Event', 'FormData', 'FieldDescription',
 'InvalidSubmit', 'NameExisted', 'NoSuchForm', 'NoSuchName',
@@ -76,6 +76,9 @@ class Event(object):
         if matchName is None or matchEmail is None:
             raise InvalidSubmit
 
+        if len(self.content_fields) != len(content):
+            raise InvalidSubmit
+
         validContent = True
         for field, value in zip(self.content_fields, content):
             contentType = field.field_type
@@ -83,7 +86,8 @@ class Event(object):
             if contentType in ['input', 'textarea']:
                 validContent = field.min_len <= len(value) <= field.max_len
             elif contentType == 'number':
-                validContent = field.min_val <= value <= field.max_val
+                matchNumber = re.match('-?[0-9]+', value)
+                validContent = matchNumber and field.min_val <= long(value) <= field.max_val
 
             if not validContent:
                 raise InvalidSubmit
@@ -100,7 +104,7 @@ class Event(object):
                 VALUES (%s, %s, %s, %s)""",
                 (self.id, name, email, json.dumps(zip(
                     map(lambda x: x.field_name, self.content_fields),
-                        content))))
+                    map(escape, content)))))
         g.conn.commit()
         return g.cursor.lastrowid
 

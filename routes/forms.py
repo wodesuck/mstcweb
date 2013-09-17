@@ -38,7 +38,7 @@ def forms(name):
             form_id = eventObj.submit(
                     request.form['name'],
                     request.form['email'],
-                    request.form.getlist('content[]'))
+                    json.loads(request.form['content']))
         except form.InvalidSubmit:
             return jsonify(err_code = -1,
                     msg = u'提交内容无效',
@@ -199,14 +199,12 @@ def admin_forms_query_by_event_name(name):
     except ValueError:
         abort(400)
 
-    field_names = [field.field_name for field in eventObj.content_fields]
-
     forms = eventObj.query(items, page, status)
     for formObj in forms:
         formObj.name = escape(formObj.name)
         formObj.email = escape(formObj.email)
         formObj.created_time = formObj.created_time.strftime('%Y-%m-%d %H:%M:%S')
-        formObj.content = zip(field_names, map(escape, formObj.content))
+        formObj.content = formObj.content
     return jsonify(err_code = 0, result = [formObj.__dict__ for formObj in forms])
 
 @app.route('/admin/forms/query/<int:form_id>')
@@ -222,12 +220,10 @@ def admin_forms_query_by_id(form_id):
 
     try:
         formObj = form.Event.query_one(form_id)
-        eventObj = form.Event.get(formObj.event_id)
-    except (form.NoSuchForm, form.NoSuchEvent):
+    except form.NoSuchForm:
         abort(404)
 
-    field_names = [field.field_name for field in eventObj.content_fields]
-    formObj.content = zip(field_names, map(escape, formObj.content))
+    formObj.content = formObj.content
 
     formObj.name = escape(formObj.name)
     formObj.email = escape(formObj.email)
