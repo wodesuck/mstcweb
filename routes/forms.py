@@ -1,11 +1,11 @@
 # -*- coding: utf8 -*-
-from routes import app
+from routes import app, gen_csrf_token
 from models import form
 from models import page
 import json
 from common.userauth import check_auth
 from datetime import datetime
-from flask import (request, jsonify, render_template, abort)
+from flask import (request, jsonify, render_template, abort, escape)
 
 def _from_datetime_str(datetime_str):
     return datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
@@ -39,10 +39,13 @@ def forms(name):
                     request.form['email'],
                     json.loads(request.form['content']))
         except form.InvalidSubmit:
+            gen_csrf_token()
             return jsonify(err_code = -1, msg = u'提交内容无效')
         except form.NotStartYet:
+            gen_csrf_token()
             return jsonify(err_code = -2, msg = u'该报名时间尚未开始')
         except form.Ended:
+            gen_csrf_token()
             return jsonify(err_code = -3, msg = u'该报名时间已结束')
         else:
             return jsonify(err_code = 0,
@@ -100,9 +103,11 @@ def admin_forms_new():
         try:
             eventObj.save()
             pageObj.save()
-        except form.NameExisted, page.PageNameExist:
+        except (form.NameExisted, page.PageNameExist):
+            gen_csrf_token()
             return jsonify(err_code = -1, msg = u'此报名事件已存在')
         except form.MySQLdb.IntegrityError:
+            gen_csrf_token()
             return jsonify(err_code = -2, msg = u'数据库错误')
 
         return jsonify(err_code = 0, msg = u'新报名事件创建成功 id：%d' % eventObj.id)
@@ -124,7 +129,7 @@ def admin_forms_edit(name):
     try:
         eventObj = form.Event.get(name)
         pageObj = page.Page.get(name)
-    except form.NoSuchEvent, page.NoSuchPage:
+    except (form.NoSuchEvent, page.NoSuchPage):
         abort(404)
 
     if request.method == 'GET':
@@ -194,8 +199,10 @@ def admin_forms_query_by_event_name(name):
 
     forms = eventObj.query(items, page, status)
     for formObj in forms:
+        formObj.name = escape(formObj.name)
+        formObj.email = escape(formObj.email)
         formObj.created_time = formObj.created_time.strftime('%Y-%m-%d %H:%M:%S')
-        formObj.content = zip(field_names, formObj.content)
+        formObj.content = zip(field_names, map(escape, formObj.content))
     return jsonify(err_code = 0, result = [formObj.__dict__ for formObj in forms])
 
 @app.route('/admin/forms/query/<int:form_id>')
@@ -212,12 +219,14 @@ def admin_forms_query_by_id(form_id):
     try:
         formObj = form.Event.query_one(form_id)
         eventObj = form.Event.get(formObj.event_id)
-    except form.NoSuchForm, form.NoSuchEvent:
+    except (form.NoSuchForm, form.NoSuchEvent):
         abort(404)
 
     field_names = [field.field_name for field in eventObj.content_fields]
-    formObj.content = zip(field_names, formObj.content)
+    formObj.content = zip(field_names, map(escape, formObj.content))
 
+    formObj.name = escape(formObj.name)
+    formObj.email = escape(formObj.email)
     formObj.created_time = formObj.created_time.strftime('%Y-%m-%d %H:%M:%S')
     return jsonify(err_code = 0, result = formObj.__dict__)
 

@@ -63,12 +63,12 @@ function save_form() {
     content_fields.push(field_data);
   });
 
-  if(content_fields.length)
-    data.content_fields = JSON.stringify(content_fields);
+  data.content_fields = JSON.stringify(content_fields);
 
   $.post(location.href, data, function(respon) {
     if(respon.err_code == 0) {
       $('#edit-form .alert-success').text(respon.msg).show(200);
+      setTimeout(function() {location.reload() }, 800);
     }
     else {
       $('#edit-form .alert-danger').text(respon.msg).show(200);
@@ -142,7 +142,7 @@ function delete_page(name, ensure) {
         $('button.delete-page[data-name="' + name + '"]').parents('tr').remove();
     });
 
-  $('button.delete-page[data-name="' + name + '"]').popover('hide');
+  $('button.delete-page[data-name="' + name + '"]').popover('toggle');
 }
 
 function delete_form(name, ensure) {
@@ -154,14 +154,20 @@ function delete_form(name, ensure) {
       }
     });
 
-  $('button.delete-form[data-name="' + name + '"]').popover('hide');
+  $('button.delete-form[data-name="' + name + '"]').popover('toggle');
 }
 
 $(function() {
   //Register ajaxPrefilter for CSRF protection
   $.ajaxPrefilter(function(options, oriOptions, jqXHR) {
     if(oriOptions.type == 'post') {
-      cookie_match = document.cookie.match(/X-CSRFToken=(.+)/);
+      var cookies = document.cookie.split(';');
+      var cookie_match = false;
+      for(var i = 0; i < cookies.length; ++i) {
+        cookie_match = cookies[i].trim().match(/X-CSRFToken=(.+)/);
+        if(cookie_match)
+          break;
+      }
       if(cookie_match)
         jqXHR.setRequestHeader('X-CSRFToken', cookie_match[1]);
     }

@@ -25,12 +25,10 @@
   </div>
 
   <div class="form-group">
-    <textarea id="content" name="content">{{ content }}</textarea>
+    <textarea id="content" name="content">{{ content | safe }}</textarea>
   </div>
 
   {% block other_data_fields %}{% endblock %}
-
-  <input type="hidden" name="CSRF_TOKEN" id="CSRF_TOKEN" value="{{ CSRF_TOKEN() }}">
 
   <div class="row">
     <div class="col-md-1">
