@@ -35,8 +35,9 @@ def admin_pages():
     if not check_auth():
         abort(403)
 
+    items_list = filter(lambda x: x.layout != 'form_page', Page.get_pages_list())
     return render_template('admin_pages.html',
-            items_list = Page.get_pages_list())
+            items_list = items_list)
 
 
 @app.route('/admin/pages/new', methods=['GET', 'POST'])
