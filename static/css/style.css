@@ -131,7 +131,9 @@ body
 .carousel .carousel-indicators .active{
   background-color: #1f469e;
 }
-.carousel .carousel-inner img{
+.carousel .carousel-inner img,
+.carousel .carousel-inner a img
+{
   width: 100%;
   height: 420px;
 }
@@ -165,3 +167,9 @@ footer
 {
   width: 262.5px;
 }
+
+@-webkit-viewport { width: device-width; }
+@-moz-viewport    { width: device-width; }
+@-ms-viewport     { width: device-width; }
+@-o-viewport      { width: device-width; }
+@viewport         { width: device-width; }

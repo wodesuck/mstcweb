@@ -18,9 +18,9 @@
             <input type="email" class="form-control" id="email" placeholder="邮箱">
           </div>
         </form>
+        <br>
         <form role="form">
           {% for field in content_fields %}
-          <br>
           {% if field.field_type == "input" %}
           <div class="form-group">
             <label>{{ field.field_name }}</label>
