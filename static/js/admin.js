@@ -123,15 +123,34 @@ function show_query_forms_result(result) {
 
     var form_str = '\
     <div class="panel panel-default">\
-    <div class="panel-heading"><h3 class="panel-title">{name}</h3></div>\
+    <div class="panel-heading">\
+        <h3 class="panel-title pull-left">{name}</h3>\
+        <button class="btn btn-danger btn-xs pull-right delete-form-by-id" data-form-id="{form_id}">\
+            <span class="glyphicon glyphicon-remove"></span> 删除\
+        </button>\
+        <div class="clearfix"></div>\
+    </div>\
     <div class="panel-body">\
-    <ul>\
-    <li>报名表编号：{form_id}</li>\
-    <li>电子邮件：{email}</li>\
-    <li>报名时间：{created_time}</li>\
-    {other}\
+        <ul>\
+        <li>报名表编号：{form_id}</li>\
+        <li>电子邮件：{email}</li>\
+        <li>报名时间：{created_time}</li>\
+        {other}\
     </div>';
     $('#forms-query-result').append($.parseHTML(format_string(form_str, form)));
+  });
+
+  $('button.delete-form-by-id').each(function(i, v) {
+    $(v).popover({
+      html: true,
+      placement: 'bottom',
+      title: '删除确认',
+      container: 'body',
+      content: format_string('<p>55555不要删我～～～</p>\
+                             <button class="btn btn-default" onclick="delete_form_by_id(\'{form_id}\', true);">删掉</button>\
+                             <button class="btn btn-primary" onclick="delete_form_by_id(\'{form_id}\', false);">放开他</button>',
+                             {form_id: $(v).data('form-id')})
+    });
   });
 }
 
@@ -155,6 +174,17 @@ function delete_form(name, ensure) {
     });
 
   $('button.delete-form[data-name="' + name + '"]').popover('toggle');
+}
+
+function delete_form_by_id(form_id, ensure) {
+  if (ensure)
+    $.post('/admin/forms/delete/' + form_id, function(respon) {
+      if (respon.err_code == 0) {
+        $('button.delete-form-by-id[data-form-id="' + form_id + '"]').parents('div.panel').remove();
+      }
+    });
+
+  $('button.delete-form-by-id[data-form-id="' + form_id + '"]').popover('toggle');
 }
 
 $(function() {
