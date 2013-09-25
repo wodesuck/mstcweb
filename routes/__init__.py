@@ -37,6 +37,10 @@ def teardown(e):
     if hasattr(g, 'conn'):
         g.conn.close()
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 def init_db():
     g.conn = connect_db()
     g.cursor = g.conn.cursor()
