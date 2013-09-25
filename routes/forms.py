@@ -248,3 +248,16 @@ def admin_forms_change_status(form_id, status):
     else:
         return jsonify(err_code = 0,
                 msg = u'修改成功，报名表（%d）当前状态为：%d' % (form_id, status))
+
+@app.route('/admin/forms/delete/<int:form_id>', methods = ['POST'])
+def admin_forms_delete_by_id(form_id):
+    """
+    Delete the form with the specific id.
+    Administrator should have logged in to access this page.
+    Return the query result as json.
+    """
+    if not check_auth():
+        abort(403)
+
+    form.Event.delete_form(form_id)
+    return jsonify(err_code = 0, msg = u'报名表（ %d）已删除' % form_id)
