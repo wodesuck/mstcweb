@@ -39,9 +39,14 @@ def forms(name):
                     request.form['name'],
                     request.form['email'],
                     json.loads(request.form['content']))
-        except form.InvalidSubmit:
+        except form.InvalidSubmit, e:
+            if e.error_field == 'id':
+                return jsonify(err_code = -1,
+                        msg = u'报名事件不存在',
+                        new_token = new_token)
             return jsonify(err_code = -1,
-                    msg = u'提交内容无效',
+                    err_field = e.error_field,
+                    msg = u'提交内容无效，请检查您的输入',
                     new_token = new_token)
         except form.NotStartYet:
             return jsonify(err_code = -2,

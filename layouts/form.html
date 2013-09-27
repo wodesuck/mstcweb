@@ -9,11 +9,11 @@
       <div class="container" id="formbody">
         <input type="hidden" id="csrf" value={{ CSRF_TOKEN() }}>
         <form class="form-inline" role="form">
-          <div class="form-group">
+          <div class="form-group" id="field_name">
             <label class="sr-only" for="name">姓名</label>
             <input type="text" class="form-control" id="name" placeholder="姓名">
           </div>
-          <div class="form-group">
+          <div class="form-group" id="field_email">
             <label class="sr-only" for="email">邮箱</label>
             <input type="email" class="form-control" id="email" placeholder="邮箱">
           </div>
@@ -22,19 +22,19 @@
         <form role="form">
           {% for field in content_fields %}
           {% if field.field_type == "input" %}
-          <div class="form-group">
+          <div class="form-group" id="{{ 'field_content' ~ loop.index0 }}">
             <label>{{ field.field_name }}</label>
             <input type="text" class="form-control content">
           </div>
           {% endif %}
           {% if field.field_type == "textarea" %}
-          <div class="form-group">
+          <div class="form-group" id="{{ 'field_content' ~ loop.index0 }}">
             <label>{{ field.field_name }}</label>
             <textarea class="form-control content" rows="3"></textarea>
           </div>
           {% endif %}
           {% if field.field_type == "number" %}
-          <div class="form-group">
+          <div class="form-group" id="{{ 'field_content' ~ loop.index0 }}">
             <label>{{ field.field_name }}</label>
             <input type="number" class="form-control content">
           </div>
@@ -79,12 +79,18 @@
                 if (response.err_code == 0) {
                     $("#formbody").remove();
                     $("#sucmsg")[0].textContent = response.msg;
-					$("#cancel").text("关闭");
+                    $("#cancel").text("关闭");
                 }
                 else {
                     $("#errmsg")[0].textContent = response.msg;
+                    if (response.err_field) {
+                        $("#" + response.err_field).addClass("has-error");
+                        $("#" + response.err_field)[0].children[1].onchange = function() {
+                            $("#" + response.err_field).removeClass("has-error");
+                        };
+                    }
                     $("#submit")[0].disabled = false;
-					$("#csrf").val(response.new_token);
+                    $("#csrf").val(response.new_token);
                 }
             }, "json");
     }

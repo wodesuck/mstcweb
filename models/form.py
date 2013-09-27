@@ -67,19 +67,19 @@ class Event(object):
         Returns the id of the new application form.
         """
         if not self.id:
-            raise InvalidSubmit
+            raise InvalidSubmit('id')
         
         matchName = re.match(u'[\u4e00-\u9fa5]{2,4}', name)
+        if matchName is None:
+            raise InvalidSubmit('field_name')
+
         matchEmail = re.match(
                 '\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*', email)
-
-        if matchName is None or matchEmail is None:
-            raise InvalidSubmit
-
-        if len(self.content_fields) != len(content):
-            raise InvalidSubmit
+        if matchEmail is None:
+            raise InvalidSubmit('field_email')
 
         validContent = True
+        fieldIndex = 0
         for field, value in zip(self.content_fields, content):
             contentType = field.field_type
 
@@ -90,7 +90,9 @@ class Event(object):
                 validContent = matchNumber and field.min_val <= long(value) <= field.max_val
 
             if not validContent:
-                raise InvalidSubmit
+                raise InvalidSubmit('field_content' + str(fieldIndex))
+
+            fieldIndex += 1
 
         submitTime = datetime.now()
         if submitTime < self.start_time:
@@ -319,7 +321,8 @@ class NameExisted(Exception):
     pass
 
 class InvalidSubmit(Exception):
-    pass
+    def __init__(self, error_field):
+        self.error_field = error_field
 
 class NotStartYet(Exception):
     pass
