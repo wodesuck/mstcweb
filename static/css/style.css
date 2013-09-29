@@ -134,7 +134,7 @@ body
 
 .about
 {
-  margin-top: 50px;
+  margin: 50px 10px 0;
 }
 .about .bar p{
   color: #ffffff;
@@ -142,6 +142,11 @@ body
   line-height: 300px;
   text-align: center;
 }
+@media (max-width: 992px){
+.about .bar p{
+    line-height: 40px;
+    margin: 20px;
+}}
 .about .col-md-8{
   margin-top: 25px;
   margin-bottom: 25px;
