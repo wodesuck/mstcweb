@@ -131,12 +131,6 @@ body
 .carousel .carousel-indicators .active{
   background-color: #1f469e;
 }
-.carousel .carousel-inner img,
-.carousel .carousel-inner a img
-{
-  width: 100%;
-  height: 420px;
-}
 
 .about
 {
