@@ -88,6 +88,10 @@ class Event(object):
             elif contentType == 'number':
                 matchNumber = re.match('-?[0-9]+', value)
                 validContent = matchNumber and field.min_val <= long(value) <= field.max_val
+            elif contentType == 'select':
+                validContent = value in field.option_list
+            else:
+                validContent = False
 
             if not validContent:
                 raise InvalidSubmit
@@ -294,7 +298,7 @@ class FieldDescription(object):
 
         if option_list is None:
             option_list = []
-        elif option_list is not list:
+        elif not isinstance(option_list, list):
             option_list = filter(None, map(lambda x: x.strip(),
                 option_list.split(',')))
         self.option_list = list(set(option_list))

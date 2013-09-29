@@ -19,17 +19,17 @@
       <option value="input" {{ 'selected' if field.field_type == 'input' }}>短文本</option>
       <option value="textarea" {{ 'selected' if field.field_type == 'textarea' }}>长文本</option>
       <option value="number" {{ 'selected' if field.field_type == 'number' }}>数字</option>
-      <option value="bool" {{ 'selected' if field.field_type == 'bool' }}>选项</option>
+      <option value="bool" {{ 'selected' if field.field_type == 'bool' }}>复选框</option>
+      <option value="select" {{ 'selected' if field.field_type == 'select' }}>列表选择</option>
     </select>
     {% if field.field_type in ['input', 'textarea'] %}
-    <input type="number" class="lower-bound form-control" placeholder="下限(长度或数值)" value="{{ field.min_len }}">
-    <input type="number" class="upper-bound form-control" placeholder="上限(长度或数值)" value="{{ field.max_len }}">
+    <input type="text" class="extra-properties form-control" placeholder="长度范围(默认0,65536)" value="{{ field.min_len }},{{ field.max_len }}">
     {% elif field.field_type == 'number' %}
-    <input type="number" class="lower-bound form-control" placeholder="下限(长度或数值)" value="{{ field.min_val }}">
-    <input type="number" class="upper-bound form-control" placeholder="上限(长度或数值)" value="{{ field.max_val }}">
+    <input type="text" class="extra-properties form-control" placeholder="值范围(默认-65536,65535)" value="{{ field.min_val }},{{ field.max_val }}">
+    {% elif field.field_type == 'select' %}
+    <input type="text" class="extra-properties form-control" placeholder="选项列表(英文逗号分隔)" value="{{ ','.join(field.option_list) }}">
     {% else %}
-    <input type="number" class="lower-bound form-control" placeholder="下限(长度或数值)">
-    <input type="number" class="upper-bound form-control" placeholder="上限(长度或数值)">
+    <input type="text" class="extra-properties form-control" placeholder="(留空)">
     {% endif %}
     <span class="glyphicon glyphicon-remove remove-field"></span>
   </div>
@@ -42,9 +42,9 @@
       <option value="textarea">长文本</option>
       <option value="number">数字</option>
       <option value="bool">选项</option>
+      <option value="select">列表选择</option>
     </select>
-    <input type="number" class="lower-bound form-control" placeholder="下限(长度或数值)">
-    <input type="number" class="upper-bound form-control" placeholder="上限(长度或数值)">
+    <input type="text" class="extra-properties form-control" placeholder="长度范围(默认0,65536)">
     <span class="glyphicon glyphicon-remove remove-field"></span>
   </div>
   <span class="glyphicon glyphicon-plus add-field"></span>
