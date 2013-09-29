@@ -88,6 +88,12 @@ class Event(object):
             elif contentType == 'number':
                 matchNumber = re.match('-?[0-9]+', value)
                 validContent = matchNumber and field.min_val <= long(value) <= field.max_val
+            elif contentType == 'select':
+                validContent = value in field.option_list
+            elif contentType == 'bool':
+                pass
+            else:
+                validContent = False
 
             if not validContent:
                 raise InvalidSubmit('field_content' + str(fieldIndex))
@@ -281,16 +287,25 @@ class FieldDescription(object):
     'textarea': long text with the length between min_len and max_len
     'number': number between min_val and max_val
     'bool': boolean value.
+    'select': option selected from a list
     """
     def __init__(self, field_name, field_type = 'input',
             min_len = 0, max_len = 65536,
-            min_val = -65535, max_val = 65535):
+            min_val = -65535, max_val = 65535,
+            option_list = None):
         self.field_name = field_name
         self.field_type = field_type
         self.min_len = min_len
         self.max_len = max_len
         self.min_val = min_val
         self.max_val = max_val
+
+        if option_list is None:
+            option_list = []
+        elif not isinstance(option_list, list):
+            option_list = filter(None, map(lambda x: x.strip(),
+                option_list.split(',')))
+        self.option_list = list(set(option_list))
 
     def to_dict(self):
         if self.field_type == 'input' or self.field_type == 'textarea':
@@ -305,7 +320,12 @@ class FieldDescription(object):
                 'field_type': 'number',
                 'min_val': self.min_val,
                 'max_val': self.max_val}
-        else: 
+        elif self.field_type == 'select':
+            return {
+                'field_name': self.field_name,
+                'field_type': 'select',
+                'option_list': self.option_list}
+        elif self.field_type == 'bool':
             return {
                 'field_name': self.field_name,
                 'field_type': 'bool'}

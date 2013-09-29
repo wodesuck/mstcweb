@@ -17,8 +17,10 @@ formFields.append(form.FieldDescription(u'短文本(4 - 10)', 'input', 4, 10))
 formFields.append(form.FieldDescription(u'长文本', 'textarea'))
 formFields.append(form.FieldDescription(u'数字(-10 - 10)', 'number', min_val = -10, max_val = 10))
 formFields.append(form.FieldDescription(u'布尔', 'bool'))
+formFields.append(form.FieldDescription(u'列表选择', 'select',
+    option_list = [u'选项1', u'选项2']))
 
-validSubmitContent = [u'短文本内容', u'长文本内容', '5', True]
+validSubmitContent = [u'短文本内容', u'长文本内容', '5', True, u'选项2']
 
 content_fields_str = json.dumps(map(lambda x: x.to_dict(), formFields))
 before = (now - timeDelta).strftime('%Y-%m-%d %H:%M:%S')
@@ -156,16 +158,22 @@ def testSubmitFormInvalidTextLength():
     eventObj = form.Event.get('testForm')
     assert_raises(form.InvalidSubmit, eventObj.submit,
             u'测试', 'abc.def+ghi@mail2.sysu.edu.cn',
-            [u'过短', u'长文本内容', '5', True])
+            [u'过短', u'长文本内容', '5', True, u'选项2'])
     assert_raises(form.InvalidSubmit, eventObj.submit,
             u'测试', 'abc.def+ghi@mail2.sysu.edu.cn',
-            [u'过长过长过长过长过长过长', u'长文本内容', '5', True])
+            [u'过长过长过长过长过长过长', u'长文本内容', '5', True, u'选项2'])
 
 def testSubmitFormInvalidNumber():
     eventObj = form.Event.get('testForm')
     assert_raises(form.InvalidSubmit, eventObj.submit,
             u'测试', 'abc.def+ghi@mail2.sysu.edu.cn',
-            [u'短文本内容', u'长文本内容', '-20', True])
+            [u'短文本内容', u'长文本内容', '-20', True, u'选项2'])
+
+def testSubmitFormInvalidOption():
+    eventObj = form.Event.get('testForm')
+    assert_raises(form.InvalidSubmit, eventObj.submit,
+            u'测试', 'abc.def+ghi@mail2.sysu.edu.cn',
+            [u'短文本内容', u'长文本内容', '5', True, u'错误选项'])
 
 def testSubmitFormNotStarted():
     eventObj = form.Event.get('testFormNotStarted')

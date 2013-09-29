@@ -45,19 +45,29 @@ function save_form() {
     if(!field_data.field_name)
       return true;
 
-    var lower = Number(field.children('.lower-bound').val());
-    var upper = Number(field.children('.upper-bound').val());
+    var _extra_properties = field.children('.extra-properties').val().split(',');
+    var extra_properties = [];
+    for(var i = 0; i < _extra_properties.length; ++i) {
+      if(_extra_properties[i].trim())
+        extra_properties.push(_extra_properties[i].trim());
+    }
     if(field_data.field_type == 'input' || field_data.field_type == 'textarea') {
-      if(lower)
-        field_data.min_len = lower;
-      if(upper)
-        field_data.max_len = upper;
+      if(extra_properties.length == 2) {
+        field_data.min_len = Number(extra_properties[0]);
+        field_data.max_len = Number(extra_properties[1]);
+      }
     }
     if(field_data.field_type == 'number') {
-      if(lower)
-        field_data.min_val = lower;
-      if(upper)
-        field_data.max_val = upper;
+      if(extra_properties.length == 2) {
+        field_data.min_val = Number(extra_properties[0]);
+        field_data.max_val = Number(extra_properties[1]);
+      }
+    }
+    if(field_data.field_type == 'select') {
+      if(extra_properties.length)
+        field_data.option_list = extra_properties;
+      else
+        return true;
     }
 
     content_fields.push(field_data);
@@ -187,6 +197,24 @@ function delete_form_by_id(form_id, ensure) {
   $('button.delete-form-by-id[data-form-id="' + form_id + '"]').popover('toggle');
 }
 
+function on_field_type_changed(the_input, new_type) {
+  the_input.val('');
+  switch(new_type) {
+    case 'input':
+    case 'textarea':
+      the_input.attr('placeholder', '长度范围(默认0,65536)');
+      break;
+    case 'number':
+      the_input.attr('placeholder', '值范围(默认-65536,65535)');
+      break;
+    case 'select':
+      the_input.attr('placeholder', '选项列表(英文逗号分隔)');
+      break;
+    default:
+      the_input.attr('placeholder', '(留空)'); break;
+  }
+}
+
 $(function() {
   //Register ajaxPrefilter for CSRF protection
   $.ajaxPrefilter(function(options, oriOptions, jqXHR) {
@@ -231,7 +259,15 @@ $(function() {
     field_form.children('.remove-field').click(function() {
       field_form.remove();
     });
+    field_form.children('.field-type').change(function() {
+      on_field_type_changed(field_form.children('.extra-properties'), $(this).val());
+    });
     $('.content-field').last().after(field_form);
+  });
+
+  $('select.field-type').change(function() {
+    var the_input = $(this).parent('.content-field').children('.extra-properties');
+    on_field_type_changed(the_input, $(this).val());
   });
 
   //Register events for the query page

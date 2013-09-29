@@ -46,6 +46,16 @@
             </label>
           </div>
           {% endif %}
+          {% if field.field_type == "select" %}
+          <div class="form-group">
+            <label>{{ field.field_name }}</label>
+            <select class="form-control content">
+              {% for an_option in field.option_list %}
+              <option value="{{ an_option }}">{{ an_option }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %}
           {% endfor %}
         </form>
       </div>
