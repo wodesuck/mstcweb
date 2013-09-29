@@ -66,6 +66,8 @@ function save_form() {
     if(field_data.field_type == 'select') {
       if(extra_properties.length)
         field_data.option_list = extra_properties;
+      else
+        return true;
     }
 
     content_fields.push(field_data);

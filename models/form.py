@@ -90,6 +90,8 @@ class Event(object):
                 validContent = matchNumber and field.min_val <= long(value) <= field.max_val
             elif contentType == 'select':
                 validContent = value in field.option_list
+            elif contentType == 'bool':
+                pass
             else:
                 validContent = False
 
