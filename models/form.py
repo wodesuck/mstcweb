@@ -192,7 +192,6 @@ class Event(object):
             g.cursor.execute("DELETE FROM pages WHERE id=%s", id)
             # delete the conrresponding form_datas
             g.cursor.execute("DELETE FROM forms_data WHERE event_id=%s", event_id)
-
             sql = "DELETE FROM `events` WHERE `id` = %s"
             g.cursor.execute(sql, event_id)
         elif name is not None:
@@ -203,7 +202,6 @@ class Event(object):
             event_id = g.cursor.fetchone()
             # delete the corresponding form_datas
             g.cursor.execute("DELETE FROM forms_data WHERE event_id=%s", event_id)
-
             sql = "DELETE FROM `events` WHERE `name` = %s"
             g.cursor.execute(sql, name)
         else:
