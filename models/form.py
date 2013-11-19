@@ -316,7 +316,11 @@ class FieldDescription(object):
         elif not isinstance(option_list, list):
             option_list = filter(None, map(lambda x: x.strip(),
                 option_list.split(',')))
-        self.option_list = list(set(option_list))
+        # self.option_list = list(set(option_list))
+        self.option_list = []
+        for x in option_list:
+            if x not in self.option_list:
+                self.option_list.append(x)
 
     def to_dict(self):
         if self.field_type == 'input' or self.field_type == 'textarea':
