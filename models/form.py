@@ -188,9 +188,22 @@ class Event(object):
         *This is a class method.*
         """
         if event_id is not None:
+            # delete the corresponding page
+            g.cursor.execute("DELETE FROM pages WHERE id=%s", id)
+            # delete the conrresponding form_datas
+            g.cursor.execute("DELETE FROM forms_data WHERE event_id=%s", event_id)
+
             sql = "DELETE FROM `events` WHERE `id` = %s"
             g.cursor.execute(sql, event_id)
         elif name is not None:
+            # delete the corresponding page
+            g.cursor.execute("DELETE FROM pages WHERE name=%s", name)
+            g.cursor.execute("SELECT events.id FROM events WHERE events.name=%s", name)
+            # get event_id
+            event_id = g.cursor.fetchone()
+            # delete the corresponding form_datas
+            g.cursor.execute("DELETE FROM forms_data WHERE event_id=%s", event_id)
+
             sql = "DELETE FROM `events` WHERE `name` = %s"
             g.cursor.execute(sql, name)
         else:
