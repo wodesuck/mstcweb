@@ -148,6 +148,7 @@ def admin_forms_edit(name):
         return render_template('admin_forms_edit.html', **ctx_data)
 
     else:
+        eventObj.name = request.form['name']
         eventObj.content_fields = map(lambda x: form.FieldDescription(**x),
                 json.loads(request.form['content_fields']))
         eventObj.start_time = _from_datetime_str(request.form['start_time'])
