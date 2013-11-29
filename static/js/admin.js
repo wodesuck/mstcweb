@@ -78,7 +78,7 @@ function save_form() {
   $.post(location.href, data, function(respon) {
     if(respon.err_code == 0) {
       $('#edit-form .alert-success').text(respon.msg).show(200);
-      setTimeout(function() {location.href = '/admin' }, 800);
+      setTimeout(function() {location.href = "/admin" }, 800);
     }
     else {
       $('#edit-form .alert-danger').text(respon.msg).show(200);
