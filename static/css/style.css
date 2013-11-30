@@ -81,7 +81,7 @@ body
   display: none;
 }
 
-#query-by-event-name, #query-by-form-id
+#query-by-event-name, #query-by-form-id, #query-by-form-name, #query-by-form-email
 {
   margin-top: 15px;
 }

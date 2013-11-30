@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 from routes import app, gen_csrf_token
 from models import form
 from models import page
@@ -213,7 +213,7 @@ def admin_forms_query_by_event_name(name):
         formObj.content = formObj.content
     return jsonify(err_code = 0, result = [formObj.__dict__ for formObj in forms])
 
-@app.route('/admin/forms/query/<int:form_id>')
+@app.route('/admin/forms/query_by_form_id/<int:form_id>')
 def admin_forms_query_by_id(form_id):
     """
     Query the form with the specific id.
@@ -235,6 +235,52 @@ def admin_forms_query_by_id(form_id):
     formObj.email = escape(formObj.email)
     formObj.created_time = formObj.created_time.strftime('%Y-%m-%d %H:%M:%S')
     return jsonify(err_code = 0, result = formObj.__dict__)
+
+@app.route('/admin/forms/query_by_form_name/<form_name>')
+def admin_forms_query_by_name(form_name):
+    """
+    Query the form with the specific name.
+    Administrator should have logged in to access this page.
+    Abort 404 if there is no such form.
+    Return the query result as json.
+    """
+    if not check_auth():
+        abort(403)
+    try:
+        form_data_list = form.FormData.query_form_data_by(form_name=form_name)
+    except form.NoSuchForm:
+        abort(404)
+
+    for form_data in form_data_list:
+        form_data.name = escape(form_data.name)
+        form_data.email = escape(form_data.email)
+        form_data.created_time = form_data.created_time.strftime('%Y-%m-%d %H:%M:%S')
+        form_data.content = form_data.content
+
+    return jsonify(err_code = 0, result = [form_data.__dict__ for form_data in form_data_list])        
+
+@app.route('/admin/forms/query_by_form_email/<form_email>')
+def admin_forms_query_by_email(form_email):
+    """
+    Query the form with the specific email.
+    Administrator should have logged in to access this page.
+    Abort 404 if there is no such form.
+    Return the query result as json.
+    """
+    if not check_auth():
+        abort(403)
+    try:
+        form_data_list = form.FormData.query_form_data_by(form_email=form_email)
+    except form.NoSuchForm:
+        abort(404)
+
+    for form_data in form_data_list:
+        form_data.content = form_data.content
+        form_data.name = escape(form_data.name)
+        form_data.email = escape(form_data.email)
+        form_data.created_time = form_data.created_time.strftime('%Y-%m-%d %H:%M:%S')
+
+    return jsonify(err_code = 0, result = [form_data.__dict__ for form_data in form_data_list])
 
 @app.route('/admin/forms/<int:form_id>/status/<int:status>', methods = ['POST'])
 def admin_forms_change_status(form_id, status):
