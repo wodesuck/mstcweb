@@ -250,6 +250,8 @@ def admin_forms_query_by_name(form_name):
         form_data_list = form.FormData.query_form_data_by(form_name=form_name)
     except form.NoSuchForm:
         abort(404)
+    except TypeError:
+        abort(404)
 
     for form_data in form_data_list:
         form_data.name = escape(form_data.name)
@@ -257,7 +259,7 @@ def admin_forms_query_by_name(form_name):
         form_data.created_time = form_data.created_time.strftime('%Y-%m-%d %H:%M:%S')
         form_data.content = form_data.content
 
-    return jsonify(err_code = 0, result = [form_data.__dict__ for form_data in form_data_list])        
+    return jsonify(err_code = 0, result = [form_data.__dict__ for form_data in form_data_list])
 
 @app.route('/admin/forms/query_by_form_email/<form_email>')
 def admin_forms_query_by_email(form_email):
@@ -272,6 +274,8 @@ def admin_forms_query_by_email(form_email):
     try:
         form_data_list = form.FormData.query_form_data_by(form_email=form_email)
     except form.NoSuchForm:
+        abort(404)
+    except TypeError:
         abort(404)
 
     for form_data in form_data_list:

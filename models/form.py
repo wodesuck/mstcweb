@@ -303,7 +303,7 @@ class FormData(object):
             para = 'email'
             val = form_email
         else:
-            raise NoSuchForm
+            raise TypeError
 
         sql = """SELECT `id`, `event_id`,
         `name`, `email`, `content`, `status`, `created_time`
@@ -312,7 +312,6 @@ class FormData(object):
         if not g.cursor.execute(sql):
             raise NoSuchForm
 
-#        return FormData(*g.cursor.fetchone())
         return [FormData(*ele) for ele in g.cursor.fetchall()]
 
 class FieldDescription(object):
