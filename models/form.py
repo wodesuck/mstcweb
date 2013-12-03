@@ -307,9 +307,9 @@ class FormData(object):
 
         sql = """SELECT `id`, `event_id`,
         `name`, `email`, `content`, `status`, `created_time`
-        FROM `forms_data` WHERE %s = '%s'""" % (para, val)
+        FROM `forms_data` WHERE %s = %%s""" % para
 
-        if not g.cursor.execute(sql):
+        if not g.cursor.execute(sql, val):
             raise NoSuchForm
 
         return [FormData(*ele) for ele in g.cursor.fetchall()]
