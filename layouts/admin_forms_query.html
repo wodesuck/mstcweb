@@ -11,6 +11,8 @@
 <ul class="nav nav-tabs" id="forms-query-tab">
   <li class="active"><a href="#query-by-event-name" data-toggle="tab">根据报名事件</a></li>
   <li><a href="#query-by-form-id" data-toggle="tab">根据报名表编号</a></li>
+  <li><a href="#query-by-form-name" data-toggle="tab">根据报名表姓名</a></li>
+  <li><a href="#query-by-form-email" data-toggle="tab">根据报名表邮箱</a></li>
 </ul>
 
 <div class="tab-content">
@@ -31,6 +33,21 @@
     </div>
     <button class="btn btn-default">查询</button>
   </div>
+
+  <div class="tab-pane row" id="query-by-form-name">
+    <div class="col-md-5">
+      <input class="form-control" placeholder="报名表姓名">
+    </div>
+    <button class="btn btn-default">查询</button>
+  </div>
+
+  <div class="tab-pane row" id="query-by-form-email">
+    <div class="col-md-5">
+      <input class="form-control" placeholder="报名表邮箱">
+    </div>
+    <button class="btn btn-default">查询</button>
+  </div>
+
 </div>
 
 <div id="forms-query-result">

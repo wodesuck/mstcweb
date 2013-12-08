@@ -102,9 +102,29 @@ function query_forms(by) {
   else if(by == 'form_id') {
     var form_id = $('#query-by-form-id input').val();
 
-    $.get('/admin/forms/query/' + form_id, function(respon) {
+    $.get('/admin/forms/query_by_form_id/' + form_id, function(respon) {
       if(respon.err_code == 0)
         show_query_forms_result([respon.result]);
+    }).fail(function() {
+      show_query_forms_result([]);
+    });
+  }
+  else if(by == 'form_name') {
+    var form_name = $('#query-by-form-name input').val();
+
+    $.get('/admin/forms/query_by_form_name/' + form_name, function(respon) {
+      if (respon.err_code == 0)
+        show_query_forms_result(respon.result);
+    }).fail(function() {
+      show_query_forms_result([]);
+    });
+  }
+  else if(by == 'form_email') {
+    var form_email = $('#query-by-form-email input').val();
+
+    $.get('/admin/forms/query_by_form_email/' + form_email, function(respon) {
+      if (respon.err_code == 0)
+        show_query_forms_result(respon.result);
     }).fail(function() {
       show_query_forms_result([]);
     });
@@ -130,7 +150,6 @@ function show_query_forms_result(result) {
                       { name: v[0], value: v[1] }));
     });
     form.other = content.join('\n');
-
     var form_str = '\
     <div class="panel panel-default">\
     <div class="panel-heading">\
@@ -277,6 +296,14 @@ $(function() {
 
   $('#query-by-form-id button').click(function() {
     query_forms('form_id');
+  })
+
+  $('#query-by-form-name button').click(function() {
+    query_forms('form_name');
+  })
+
+  $('#query-by-form-email button').click(function() {
+    query_forms('form_email');
   })
 
   //Register events for the delete buttons

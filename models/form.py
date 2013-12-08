@@ -288,6 +288,31 @@ class FormData(object):
         self.status = status
         self.created_time = created_time
 
+    @classmethod
+    def query_form_data_by(cls, form_name=None, form_email=None):
+        """
+        Query form datas by name or email.
+        Return a list of FormData object.
+        *This is a class method.*
+        Raises `NoSuchForm` if there doesn't exist such an application form.
+        """
+        if form_name != None:
+            para = 'name'
+            val = form_name
+        elif form_email != None:
+            para = 'email'
+            val = form_email
+        else:
+            raise TypeError
+
+        sql = """SELECT `id`, `event_id`,
+        `name`, `email`, `content`, `status`, `created_time`
+        FROM `forms_data` WHERE %s = %%s""" % para
+
+        if not g.cursor.execute(sql, val):
+            raise NoSuchForm
+
+        return [FormData(*ele) for ele in g.cursor.fetchall()]
 
 class FieldDescription(object):
     """
